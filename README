@@ -1,66 +1,66 @@
 Authors: Morgan Strong, Nathan Standiford
 
 TODO:
-	Create the necessary project modules, files and classes.
+Create the necessary project modules, files and classes.
+
+**	checkout
+**	checkin
+**	install
+**	alembic
+**	plugins	
+
+
+""" This Module is the basic in-memory data structure representing the entirety of the
+	project. All other modules will perform operations on instances of these nodes. The 
+	in-memory model is necessary for potential visualization purposes in the GUI later on.
+"""
+
+**	project (module)
+	
+--	project (class)
+	# An in-memory instance of a "project." Contains global project information:
+	# Project name. Basic project functionality: loadExisting, saveMetaData.
+	
+	**	projectNodes
+		--	Node
+			# Abstract Node. Contains a list of children and a reference to parent.
+			# Representative of a generic folder. Should contain overridable method
+			# "checkIntegrity" to allow concrete nodes to check their own structure for
+			# errors.
 		
-		**	checkout
-		**	checkin
-		**	install
-		**	alembic
-		**	plugins	
+		--	versionedNode
+			# Abstract Node. Inherits from Node class. Contains additional methods for
+			# checkout, checkin, and install.
 		
+		--	rootNode
+			# Concrete Node. Inherits from Node. Represents the root project folder.
+			# Folder contains at least: "assets","globals","sequences", and ".projectInfo".  
+	
+		--	assetNode
+			# Concrete Node. Inherits from versionedNode. Represents a project asset folder.
+			# Folder contains "src" and "inst" directories. This node should contain a
+			# "packageType" used to separate maya and houdini (or other packages) type assets.
+	
+		--	shotNode
+			# Concrete Node. Represents a project shot folder. Folder contains an animationNode,
+			# an fxNode, and a finalNode. It is intended to be used as a containing folder for 
+			# the necessary elements of a shot.
 		
-		""" This Module is the basic in-memory data structure representing the entirety of the
-			project. All other modules will perform operations on instances of these nodes. The 
-			in-memory model is necessary for potential visualization purposes in the GUI later on.
-		"""
+		--	animationNode
+			# Concrete Node. Represents a project shot folder. Folder contains "src","inst", and
+			# "cache" directories. Should contain additional method for caching functionality.
+			# It is intended to be used for per shot animation.
 		
-		**	project (module)
-			
-			--	project (class)
-				# An in-memory instance of a "project." Contains global project information:
-				# Project name. Basic project functionality: loadExisting, saveMetaData.
-				
-			**	projectNodes
-				--	Node
-					# Abstract Node. Contains a list of children and a reference to parent.
-					# Representative of a generic folder. Should contain overridable method
-					# "checkIntegrity" to allow concrete nodes to check their own structure for
-					# errors.
-				
-				--	versionedNode
-					# Abstract Node. Inherits from Node class. Contains additional methods for
-					# checkout, checkin, and install.
-				
-				--	rootNode
-					# Concrete Node. Inherits from Node. Represents the root project folder.
-					# Folder contains at least: "assets","globals","sequences", and ".projectInfo".  
-			
-				--	assetNode
-					# Concrete Node. Inherits from versionedNode. Represents a project asset folder.
-					# Folder contains "src" and "inst" directories. This node should contain a
-					# "packageType" used to separate maya and houdini (or other packages) type assets.
-			
-				--	shotNode
-					# Concrete Node. Represents a project shot folder. Folder contains an animationNode,
-					# an fxNode, and a finalNode. It is intended to be used as a containing folder for 
-					# the necessary elements of a shot.
-				
-				--	animationNode
-					# Concrete Node. Represents a project shot folder. Folder contains "src","inst", and
-					# "cache" directories. Should contain additional method for caching functionality.
-					# It is intended to be used for per shot animation.
-				
-				--	fxNode
-					# Concrete Node. Represents a project fx folder. Folder contains "src" and "inst"
-					# directories. This node should contain a "packageType" used to separate maya and
-					# houdini (or other packages). It is intended to be used for per shot fx.
-				
-				--	finalNode
-					# Concrete Node. Represents a project final shot folder. Folder contains "src",
-					# "inst", and "render" directories. It is intended to be used for lighting and
-					# rendering.
-				
-				--	subNode
-					# Concrete Node. Represents a project sub-folder. Only allowed to contain other
-					# directories; no files.
+		--	fxNode
+			# Concrete Node. Represents a project fx folder. Folder contains "src" and "inst"
+			# directories. This node should contain a "packageType" used to separate maya and
+			# houdini (or other packages). It is intended to be used for per shot fx.
+		
+		--	finalNode
+			# Concrete Node. Represents a project final shot folder. Folder contains "src",
+			# "inst", and "render" directories. It is intended to be used for lighting and
+			# rendering.
+		
+		--	subNode
+			# Concrete Node. Represents a project sub-folder. Only allowed to contain other
+			# directories; no files.
