@@ -13,6 +13,9 @@ class Node(object):
 	def checkIntegrity(self):
 		raise NotImplementedError
 	
+	def _loadChildren(self):
+		raise NotImplementedError
+	
 	def getName(self):
 		return self._name
 	
@@ -23,14 +26,31 @@ class Node(object):
 		self._parent = None
 	
 	def addChild(self, child):
-		if not isInstance(child, Node):
+		if not isinstance(child, Node):
 			raise Exception("Cannot add non-Node object to list of node's children.")
 		self._children.append(child)
 	
 	def removeChild(self, notChild):
-		if not isInstance(child, Node):
+		if not isinstance(child, Node):
 			raise Exception("Cannot remove non-Node object from list of node's children.")
 		self._children.remove(notChild)
+	
+	def getChildren(self):
+		return self._children
+	
+	def preVisit(self, visitor):
+		if not isinstance(visitor, Visitor):
+			raise Exception("Nodes can only be traversed by a Visitor object")
+		visitor.run(self)
+		for x in self._children:
+			x.preVisit(visitor)
+	
+	def postVisit(self, visitor):
+		if not isinstance(visitor, Visitor):
+			raise Exception("Nodes can only be traversed by a Visitor object")
+		for x in self._children:
+			x.postVisit(visitor)
+		visitor.run(self)
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initialize Node	
 		#Constructor
@@ -42,3 +62,5 @@ class Node(object):
 		self._name = path.split('/')[-1]
 		self._parent = path.split('/')[-2]
 		self._children = []
+
+from ..visitors.visitor import Visitor

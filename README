@@ -34,7 +34,7 @@ Create the necessary project modules, files and classes.
 		
 		--	rootNode
 			# Concrete Node. Inherits from Node. Represents the root project folder.
-			# Folder contains at least: "assets","globals","sequences", and ".projectInfo".  
+			# Folder contains at least: "assets","globals","sequences"
 	
 		--	assetNode
 			# Concrete Node. Inherits from versionedNode. Represents a project asset folder.

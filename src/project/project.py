@@ -103,3 +103,6 @@ class Project:
 	
 	def getLocalDir(self):
 		return self._localDir
+	
+	def getRootNode(self):
+		return self._node

@@ -6,6 +6,7 @@
 """
 
 from project.project import Project
+from project.visitors.infoVisitor import InfoVisitor
 
 def run():
 	"""
@@ -19,6 +20,10 @@ def run():
 		proj.config()
 		print "Loading Project..."
 		proj.load()
+		
+		print "\n"
+		root = proj.getRootNode()
+		root.preVisit(InfoVisitor())
 	
 	except Exception as e:
 		print "Error:", e
