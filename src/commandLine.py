@@ -9,23 +9,23 @@ from project.project import Project
 
 def run():
 	"""
-	Initialize the Chasm Project.
-	Continually process input from the user for testing purposes.
+	* Initialize the Chasm Project.
+	* Continually process input from the user for testing purposes.
 	"""
 	try:
+		print "Creating New Project..."
 		proj = Project()
+		print "Configuring Project..."
 		proj.config()
-		print proj.getName()
-		print proj.getProjectDir()
-		print proj.getLocalDir()
-		
+		print "Loading Project..."
+		proj.load()
 	
 	except Exception as e:
-		print e
+		print "Error:", e
 		return
 	
 	while(True):
-		print("Welcome to the Chasm File Manager.")
+		print("\nWelcome to the Chasm File Manager.")
 		print("Type 'e' at this command prompt to quit.")
 		raw = raw_input()
 		

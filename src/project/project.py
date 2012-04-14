@@ -1,5 +1,8 @@
 import os.path
 import ConfigParser
+from projectNodes import *
+
+##TODO: define __all__ in the __init__.py for projectNodes.
 
 class Project:
 	"""
@@ -13,11 +16,23 @@ class Project:
 	def __init__(self):
 		self._name = ""
 		self._username = ""
-		self._nodes = []
+		self._node = None
 		self._projectDir = ""
 		self._localDir = ""
 	
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Project Prep Functions
 	def config(self):
+		"""
+		Configures the Project based on the .config.ini file found in the
+		program's root directory. This function uses the ConfigParser python
+		module for functionality.
+		
+		@precondition: .config.ini file exists in the program's root directory.
+		@precondition: .config.ini file contains complete [Project], [User], and [Misc] sections.
+		
+		@postcondition: The project is configured with the given information:
+			Name, User's Name, Project Directory, and Local Directory.
+		"""
 		filename = '.config.ini'
 		cp = ConfigParser.ConfigParser()
 		cp.read(filename)
@@ -48,6 +63,20 @@ class Project:
 			raise Exception("Local Project Directory does not exist.")
 		else:
 			self._localDir = os.path.expanduser(path)
+	
+	def load(self):
+		"""
+		Loads a project into memory by building a node network based on the
+		project directory's folder structure.  Creation of nodes can raise
+		Exceptions if the folder structure is corrupt.
+		
+		@precondition: config needs to be run successfully before load can be
+			run successfully.
+		
+		@postcondition: The node network is loaded into memory.
+		"""
+		
+		self._node = rootNode.RootNode(self._projectDir)
 	
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>> API Functions
