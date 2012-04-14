@@ -14,7 +14,16 @@ class Node(object):
 		raise NotImplementedError
 	
 	def _loadChildren(self):
-		raise NotImplementedError
+		print "Loading Children..."
+		
+		# If written correctly, this function could be defined in Node.
+		# .dirInfo should contain information about the type of folder that
+		# contains it.
+		for x in os.listdir(self._fullPath):
+			path = self._fullPath + "/" + x
+			if os.path.isdir(path):
+				if not os.path.exists(path + "/.dirInfo"):
+					self.addChild(SubNode(path))
 	
 	def getName(self):
 		return self._name
@@ -63,4 +72,6 @@ class Node(object):
 		self._parent = path.split('/')[-2]
 		self._children = []
 
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Prevent Cyclic Dependencies
+from subNode import SubNode
 from ..visitors.visitor import Visitor
