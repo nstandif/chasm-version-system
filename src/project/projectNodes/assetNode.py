@@ -12,6 +12,14 @@ class AssetNode(VersionedNode):
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
 	def checkIntegrity(self):
 		print "Checking AssetNode integrity..."
+		if not os.path.exists(self._fullPath + "/src") or \
+				not os.path.exists(self._fullPath + "/inst") or \
+				not os.path.exists(self._fullPath + "/inst/latest") or \
+				not os.path.exists(self._fullPath + "/inst/stable"):
+			raise Exception("Asset: " + self._name + " is missing a critical folder/link.")
+		
+		
+		
 		return True
 	
 	def _loadChildren(self):

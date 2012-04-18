@@ -19,27 +19,28 @@ class Node(object):
 		dirInfoFileName = '.nodeInfo'
 		parser = ConfigParser.ConfigParser()
 		
-		# If written correctly, this function could be defined in Node.
-		# .nodeInfo should contain information about the type of folder that
-		# contains it.
 		for x in os.listdir(self._fullPath):
-			child_path = self._fullPath + "/" + x
-			if os.path.isdir(child_path):
-				if not os.path.exists(child_path + "/.nodeInfo"):
-					self.addChild(SubNode(child_path))
-				else:
-					parser.read(child_path + "/" + dirInfoFileName)
-					
-					#Check integrity of metaData file.
-					if not parser.has_section("Node") or not parser.has_option("Node", "Type"):
-						raise Exception("File corrupted: " + child_path + "/" + dirInfoFileName)
-					
-					#Switch on "Type" attribute to create type of node.
-					if parser.get("Node", "Type") == "asset":
-						self.addChild(AssetNode(child_path, dirInfoFileName))
+			try:
+				child_path = self._fullPath + "/" + x
+				if os.path.isdir(child_path):
+					if not os.path.exists(child_path + "/.nodeInfo"):
+						self.addChild(SubNode(child_path))
+					else:
+						parser.read(child_path + "/" + dirInfoFileName)
 						
-					#Add different types of nodes based on the .dirInfo config
-					#file, which should contain information about the type.
+						#Check integrity of metaData file.
+						if not parser.has_section("Node") or not parser.has_option("Node", "Type"):
+							raise Exception("File corrupted: " + child_path + "/" + dirInfoFileName)
+						
+						#Switch on "Type" attribute to create type of node.
+						if parser.get("Node", "Type") == "asset":
+							self.addChild(AssetNode(child_path, dirInfoFileName))
+							
+						#Add different types of nodes based on the .dirInfo config
+						#file, which should contain information about the type.
+			except Exception as e:
+				print "Failed to load folder:", self._fullPath + x
+				print "Error Message:", e
 	
 	def getName(self):
 		return self._name

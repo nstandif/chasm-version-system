@@ -21,15 +21,12 @@ def run():
 		proj.config()
 		print "Loading Project..."
 		proj.load()
-		
 		print "\n"
-		root = proj.getRootNode()
-		root.preVisit(InfoVisitor())
 	
 	except Exception as e:
 		print "Error:", e
+		print "Stacktrace:"
 		traceback.print_tb(sys.exc_info()[2], 20)
-		#traceback.print_stack()
 		return
 
 	while(True):
@@ -46,8 +43,9 @@ def run():
 		elif raw == 'checkin':
 			print("checkin not yet implemented.")
 		
-		elif raw == 'status':
-			print("status not yet implemented.")
+		elif raw == 'stats':
+			root = proj.getRootNode()
+			root.preVisit(InfoVisitor())
 		
 		else:
 			print("Unrecognized Input.  Please try again")
