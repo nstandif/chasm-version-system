@@ -1,6 +1,6 @@
 import os.path
 import ConfigParser
-from projectNodes import *
+from projectNodes import rootNode
 
 ##TODO: define __all__ in the __init__.py for projectNodes.
 
@@ -21,6 +21,7 @@ class Project:
 		self._localDir = ""
 	
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Project Prep Functions
+	
 	def config(self):
 		"""
 		Configures the Project based on the .config.ini file found in the
@@ -33,6 +34,7 @@ class Project:
 		@postcondition: The project is configured with the given information:
 			Name, User's Name, Project Directory, and Local Directory.
 		"""
+		
 		filename = '.config.ini'
 		cp = ConfigParser.ConfigParser()
 		cp.read(filename)
@@ -63,6 +65,8 @@ class Project:
 			raise Exception("Local Project Directory does not exist.")
 		else:
 			self._localDir = os.path.expanduser(path)
+	
+	
 	
 	def load(self):
 		"""
@@ -106,3 +110,7 @@ class Project:
 	
 	def getRootNode(self):
 		return self._node
+	
+	def mkDir(self, path, name):
+		#
+		return

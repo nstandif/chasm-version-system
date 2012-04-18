@@ -5,6 +5,7 @@
 	This is a test driver used for developing the chasm file versioning system.
 """
 
+import sys, traceback
 from project.project import Project
 from project.visitors.infoVisitor import InfoVisitor
 
@@ -27,8 +28,10 @@ def run():
 	
 	except Exception as e:
 		print "Error:", e
+		traceback.print_tb(sys.exc_info()[2], 20)
+		#traceback.print_stack()
 		return
-	
+
 	while(True):
 		print("\nWelcome to the Chasm File Manager.")
 		print("Type 'e' at this command prompt to quit.")

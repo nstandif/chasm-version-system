@@ -1,4 +1,5 @@
 import os.path
+import ConfigParser
 
 class Node(object):
 	"""
@@ -15,15 +16,30 @@ class Node(object):
 	
 	def _loadChildren(self):
 		print "Loading Children..."
+		dirInfoFileName = '.nodeInfo'
+		parser = ConfigParser.ConfigParser()
 		
 		# If written correctly, this function could be defined in Node.
-		# .dirInfo should contain information about the type of folder that
+		# .nodeInfo should contain information about the type of folder that
 		# contains it.
 		for x in os.listdir(self._fullPath):
-			path = self._fullPath + "/" + x
-			if os.path.isdir(path):
-				if not os.path.exists(path + "/.dirInfo"):
-					self.addChild(SubNode(path))
+			child_path = self._fullPath + "/" + x
+			if os.path.isdir(child_path):
+				if not os.path.exists(child_path + "/.nodeInfo"):
+					self.addChild(SubNode(child_path))
+				else:
+					parser.read(child_path + "/" + dirInfoFileName)
+					
+					#Check integrity of metaData file.
+					if not parser.has_section("Node") or not parser.has_option("Node", "Type"):
+						raise Exception("File corrupted: " + child_path + "/" + dirInfoFileName)
+					
+					#Switch on "Type" attribute to create type of node.
+					if parser.get("Node", "Type") == "asset":
+						self.addChild(AssetNode(child_path, dirInfoFileName))
+						
+					#Add different types of nodes based on the .dirInfo config
+					#file, which should contain information about the type.
 	
 	def getName(self):
 		return self._name
@@ -62,7 +78,7 @@ class Node(object):
 		visitor.run(self)
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initialize Node	
-		#Constructor
+	#Constructor
 	def __init__(self, path):
 		if not os.path.exists(path):
 			raise Exception("The path does not exist:",path)
@@ -73,5 +89,7 @@ class Node(object):
 		self._children = []
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Prevent Cyclic Dependencies
+#from versionedNode import VersionedNode
 from subNode import SubNode
+from assetNode import AssetNode
 from ..visitors.visitor import Visitor
