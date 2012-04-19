@@ -35,6 +35,22 @@ class Node(object):
 						#Switch on "Type" attribute to create type of node.
 						if parser.get("Node", "Type") == "asset":
 							self.addChild(AssetNode(child_path, dirInfoFileName))
+						#elif parser.get("Node", "Type") == "shot":
+						#	self.addChild(ShotNode(child_path, dirInfoFileName))
+						#elif parser.get("Node", "Type") == "animation":
+						#	self.addChild(AnimationNode(child_path, dirInfoFileName))
+						#elif parser.get("Node", "Type") == "fx":
+						#	self.addChild(FxNode(child_path, dirInfoFileName))
+						#elif parser.get("Node", "Type") == "charfx":
+						#	self.addChild(CharfxNode(child_path, dirInfoFileName))
+						#elif parser.get("Node", "Type") == "lighting":
+						#	self.addChild(LightingNode(child_path, dirInfoFileName))
+						#elif parser.get("Node", "Type") == "compositing":
+						#	self.addChild(CompositingNode(child_path, dirInfoFileName))
+						#elif parser.get("Node", "Type") == "custom":
+						#	self.addChild(CustomNode(child_path, dirInfoFileName))
+						else:
+							raise Exception("Unrecognized Node Type.")
 							
 						#Add different types of nodes based on the .dirInfo config
 						#file, which should contain information about the type.
