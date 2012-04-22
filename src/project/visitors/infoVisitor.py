@@ -10,21 +10,21 @@ class InfoVisitor(Visitor):
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
 	def run(self, curNode):
-		print "Name:", curNode.getName()
-		print "Children:"
+		print ("Name:", curNode.getName())
+		print ("Children:")
 		for x in curNode.getChildren():
-			print "\t" + x.getName()
+			print ("\t" + x.getName())
 		
 		if isinstance(curNode, VersionedNode):
-			print "Version Info:"
-			print "\tLatest Version:", curNode.getLatestVersion()
-			print "\tLocked: ", curNode.isLocked()
-			print "\tLastCheckoutTime: ", curNode.getLastCheckoutTime()
-			print "\tLastCheckoutUser: ", curNode.getLastCheckoutUser()
-			print "\tLastCheckinTime: ", curNode.getLastCheckinTime()
-			print "\tLastCheckinUser: ", curNode.getLastCheckinUser()
+			print ("Version Info:")
+			print ("\tLatest Version:", curNode.getLatestVersion())
+			print ("\tLocked: ", curNode.isLocked())
+			print ("\tLastCheckoutTime: ", curNode.getLastCheckoutTime())
+			print ("\tLastCheckoutUser: ", curNode.getLastCheckoutUser())
+			print ("\tLastCheckinTime: ", curNode.getLastCheckinTime())
+			print ("\tLastCheckinUser: ", curNode.getLastCheckinUser())
 			
-		print "-----"
+		print ("-----")
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initialize Visitor	
 	#Constructor

@@ -3,6 +3,7 @@ import ConfigParser
 from projectNodes import rootNode
 
 ##TODO: define __all__ in the __init__.py for projectNodes.
+##TODO: Perhaps refactor the path stuff into a "PathFactory" of sorts.  This could also handle path validation
 
 class Project:
 	"""
@@ -49,7 +50,8 @@ class Project:
 		
 		#Parse Project Directory
 		path = cp.get("Project", "Directory")
-		if path[0] != '/':
+		
+		if path[0] != '/': #TODO This wont work on windows
 			raise Exception("Project Directory must be an absolute path.")
 		if not os.path.exists(path):
 			raise Exception("Project Directory does not exist.")
@@ -88,7 +90,7 @@ class Project:
 		return self._name
 	
 	def setProjectDir(self, path):
-		if path[0] != '/':
+		if path[0] != '/': #TODO this wont work on windows
 			raise Exception("Project Directory must be an absolute path.")
 		if not os.path.exists(path):
 			raise Exception("Project Directory does not exist.")

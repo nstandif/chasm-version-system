@@ -11,7 +11,7 @@ class AssetNode(VersionedNode):
 	
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
 	def checkIntegrity(self):
-		print "Checking AssetNode integrity..."
+		print ("Checking AssetNode integrity...")
 		return True
 	
 	def _loadChildren(self):

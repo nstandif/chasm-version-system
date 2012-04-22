@@ -11,7 +11,7 @@ class SubNode(Node):
 	
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
 	def checkIntegrity(self):
-		print "Checking SubNode integrity..."
+		print ("Checking SubNode integrity...")
 		return True
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initialize Node	

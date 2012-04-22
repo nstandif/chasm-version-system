@@ -14,11 +14,11 @@ class VersionedNode(Node):
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
 	#Load versioning information
 	def __loadMetaData(self, dirInfoFileName):
-		print "Loading VersionedNode Data..."
+		print ("Loading VersionedNode Data...")
 		parser = ConfigParser.ConfigParser()
-		parser.read(self._fullPath + "/" + dirInfoFileName)
+		parser.read(os.path.join(self._fullPath, dirInfoFileName))
 		if not parser.has_section("Versioning"):
-			raise Exception("File corrupted: " + self._fullPath + "/" + dirInfoFileName)
+			raise Exception("File corrupted: " + os.path.join(self._fullPath, dirInfoFileName))
 		
 		if parser.has_option("Versioning", "LatestVersion"):
 			self._latestVersion = parser.get("Versioning", "LatestVersion")
