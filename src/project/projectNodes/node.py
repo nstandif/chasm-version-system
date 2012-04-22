@@ -84,8 +84,8 @@ class Node(object):
 			raise Exception("The path does not exist:",path)
 			
 		self._fullPath = path
-		self._name = path.split('/')[-1]
-		self._parent = path.split('/')[-2]
+		self._name = path.split(os.path.sep)[-1]
+		self._parent = path.split(os.path.sep)[-2]
 		self._children = []
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Prevent Cyclic Dependencies

@@ -37,6 +37,7 @@ class Project:
 		"""
 		
 		filename = '.config.ini'
+		#filename = '.winConfig.ini'
 		cp = ConfigParser.ConfigParser()
 		cp.read(filename)
 		
@@ -51,7 +52,7 @@ class Project:
 		#Parse Project Directory
 		path = cp.get("Project", "Directory")
 		
-		if path[0] != '/': #TODO This wont work on windows
+		if path[0] != os.path.sep:
 			raise Exception("Project Directory must be an absolute path.")
 		if not os.path.exists(path):
 			raise Exception("Project Directory does not exist.")
@@ -90,7 +91,7 @@ class Project:
 		return self._name
 	
 	def setProjectDir(self, path):
-		if path[0] != '/': #TODO this wont work on windows
+		if path[0] != os.path.sep:
 			raise Exception("Project Directory must be an absolute path.")
 		if not os.path.exists(path):
 			raise Exception("Project Directory does not exist.")
