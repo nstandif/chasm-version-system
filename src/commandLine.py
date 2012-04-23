@@ -21,7 +21,6 @@ def run():
 		proj.config()
 		print "Loading Project..."
 		proj.load()
-		print "\n"
 	
 	except Exception as e:
 		print "Error:", e

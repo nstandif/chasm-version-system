@@ -20,6 +20,11 @@ class RootNode(Node):
 	#Constructor
 	def __init__(self, path):
 		super(RootNode, self).__init__(path)
-		self._loadChildren()
+		errorList = self._loadChildren()
 		self.checkIntegrity()
+		
+		if errorList:
+			print "\nErrors occurred while loading:"
+			for x in errorList:
+				print x
 		

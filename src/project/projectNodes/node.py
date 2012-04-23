@@ -16,6 +16,7 @@ class Node(object):
 	
 	def _loadChildren(self):
 		print "Loading Children..."
+		errorList = []
 		dirInfoFileName = '.nodeInfo'
 		parser = ConfigParser.ConfigParser()
 		
@@ -24,7 +25,7 @@ class Node(object):
 				child_path = self._fullPath + "/" + x
 				if os.path.isdir(child_path):
 					if not os.path.exists(child_path + "/.nodeInfo"):
-						self.addChild(SubNode(child_path))
+						self.addChild(SubNode(child_path, errorList))
 					else:
 						parser.read(child_path + "/" + dirInfoFileName)
 						
@@ -35,10 +36,10 @@ class Node(object):
 						#Switch on "Type" attribute to create type of node.
 						if parser.get("Node", "Type") == "asset":
 							self.addChild(AssetNode(child_path, dirInfoFileName))
-						#elif parser.get("Node", "Type") == "shot":
-						#	self.addChild(ShotNode(child_path, dirInfoFileName))
-						#elif parser.get("Node", "Type") == "animation":
-						#	self.addChild(AnimationNode(child_path, dirInfoFileName))
+						elif parser.get("Node", "Type") == "shot":
+							self.addChild(ShotNode(child_path, dirInfoFileName))
+						elif parser.get("Node", "Type") == "animation":
+							self.addChild(AnimationNode(child_path, dirInfoFileName))
 						#elif parser.get("Node", "Type") == "fx":
 						#	self.addChild(FxNode(child_path, dirInfoFileName))
 						#elif parser.get("Node", "Type") == "charfx":
@@ -55,8 +56,9 @@ class Node(object):
 						#Add different types of nodes based on the .dirInfo config
 						#file, which should contain information about the type.
 			except Exception as e:
-				print "Failed to load folder:", self._fullPath + x
-				print "Error Message:", e
+				errorList.append("Failed to load folder: " + child_path + "\n\tError Message: " + str(e))
+		
+		return errorList
 	
 	def getName(self):
 		return self._name
@@ -109,4 +111,6 @@ class Node(object):
 #from versionedNode import VersionedNode
 from subNode import SubNode
 from assetNode import AssetNode
+from shotNode import ShotNode
+from animationNode import AnimationNode
 from ..visitors.visitor import Visitor

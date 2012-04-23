@@ -32,6 +32,23 @@ class VersionedNode(Node):
 			self._lastCheckinTime = time.strptime(parser.get("Versioning", "LastCheckinTime"), "%a, %d %b %Y %I:%M:%S %p")
 		if parser.has_option("Versioning", "LastCheckinUser"):
 			self._lastCheckinUser = parser.get("Versioning", "LastCheckinUser")
+	
+	def checkIntegrity(self):
+		print "Checking Versioning integrity..."
+		if not os.path.exists(self._fullPath + "/src") or \
+				not os.path.exists(self._fullPath + "/inst") or \
+				not os.path.exists(self._fullPath + "/inst/latest") or \
+				not os.path.exists(self._fullPath + "/inst/stable"):
+			raise Exception("Versioned Folder: " + self._fullPath + " is missing a critical folder/link.")
+		if not os.path.exists(os.path.join(self._fullPath, "src", "v"+str(self._latestVersion))):
+			raise Exception("Versioned Folder: " + self._name + "'s latest version number doesn't match any folder name in src.")
+		return True
+	
+	def _loadChildren(self):
+		#Load src and inst here...
+		#May not need to do anything, but should at least override _loadChildren
+		#from Node.
+		return
 		
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>> API Functions
 	def getLatestVersion(self):

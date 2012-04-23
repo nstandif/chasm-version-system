@@ -1,0 +1,19 @@
+[Node]
+Type: asset
+
+# Type: asset, shot, animation, fx, charfx, lighting, compositing, custom
+
+[Versioning]
+LatestVersion: 0
+Locked: False
+LastCheckoutTime: Thu, 28 Jun 2001 2:17:15 PM
+LastCheckoutUser: Brian Kingery
+LastCheckinTime: Thu, 28 Jun 2001 4:20:00 PM
+LastCheckinUser: Nathan Standiford
+
+# LatestVersion: 0, 1, 2, ...
+# Locked: False, True
+# ...Time: Thu, 28 Jun 2001 2:17:15 PM
+#		To Write a time: time.strftime("%a, %d %b %Y %I:%M:%S %p", gmtime())
+#		To Read a time:  time.strptime(timeString, "%a, %d %b %Y %I:%M:%S %p")
+# ...User: Morgan Strong

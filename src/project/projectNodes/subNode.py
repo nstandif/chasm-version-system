@@ -16,8 +16,8 @@ class SubNode(Node):
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initialize Node	
 	#Constructor
-	def __init__(self, path):
+	def __init__(self, path, errorList):
 		super(SubNode, self).__init__(path)
-		self._loadChildren()
+		errorList.extend(self._loadChildren())
 		self.checkIntegrity()
 		
