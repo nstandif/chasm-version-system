@@ -13,7 +13,7 @@ class RootNode(Node):
 	
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
 	def checkIntegrity(self):
-		print "Checking RootNode integrity..."
+		print ("Checking RootNode integrity...")
 		return True
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initialize Node	

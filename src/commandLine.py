@@ -15,11 +15,11 @@ def run():
 	* Continually process input from the user for testing purposes.
 	"""
 	try:
-		print "Creating New Project..."
+		print ("Creating New Project...")
 		proj = Project()
-		print "Configuring Project..."
+		print ("Configuring Project...")
 		proj.config()
-		print "Loading Project..."
+		print ("Loading Project...")
 		proj.load()
 	
 	except Exception as e:
