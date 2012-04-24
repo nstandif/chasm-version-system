@@ -11,6 +11,7 @@ class InfoVisitor(Visitor):
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
 	def run(self, curNode):
 		print "Name:", curNode.getName()
+		print "Type:", curNode.__class__
 		print "Children:"
 		for x in curNode.getChildren():
 			print "\t" + x.getName()

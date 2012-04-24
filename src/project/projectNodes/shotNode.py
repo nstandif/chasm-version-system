@@ -14,7 +14,7 @@ class ShotNode(Node):
 		print "Checking ShotNode integrity..."
 		
 		children = os.listdir(self._fullPath)
-		validChildren = ["animation", "fx", "charfx", "lighting", "compositing"]
+		validChildren = ["animation", "fx", "charfx", "lighting", "compositing", "custom"]
 		
 		toRemove = []
 		for x in children:
@@ -26,34 +26,15 @@ class ShotNode(Node):
 			children.remove(x)
 		
 		if children:
-			print children
 			raise Exception("Shot: " + self._name + " contains invalid folders. \
-Valid folders are: animation, fx, charfx, lighting, and compositing")
+Valid folders are: animation, fx, charfx, lighting, compositing, and custom.")
 		
 		return True
-	
-	#def _loadChildren(self):
-	#	#Load animation, fx, charfx, lighting, and compositing
-	#	for x in os.listdir(self._fullPath):
-	#		if os.path.isdir(self._fullPath + "/" + x):
-	#			if x == "animation":
-	#				self.addChild(AnimationNode())
-	#			elif x == "fx":
-	#				self.addChild(FxNode())
-	#			elif x == "charfx":
-	#				self.addChild(CharfxNode())
-	#			elif x == "lighting":
-	#				self.addChild(LightingNode())
-	#			elif x == "compositing":
-	#				self.addChild(CompositingNode())
-	#	return
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initialize Node	
 	#Constructor
-	def __init__(self, path, dirInfoFileName):
+	def __init__(self, path, dirInfoFileName, errorList):
 		super(ShotNode, self).__init__(path)
 		self.checkIntegrity()
-		print "this is called."
-		self._loadChildren()
-		print self._children
+		errorList.extend(self._loadChildren())
 		

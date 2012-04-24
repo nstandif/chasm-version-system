@@ -5,7 +5,7 @@
 	This is a test driver used for developing the chasm file versioning system.
 """
 
-import sys, traceback
+import os, sys, traceback
 from project.project import Project
 from project.visitors.infoVisitor import InfoVisitor
 
@@ -45,6 +45,9 @@ def run():
 		elif raw == 'stats':
 			root = proj.getRootNode()
 			root.preVisit(InfoVisitor())
+		
+		elif raw == 'clear':
+			os.system("clear")
 		
 		else:
 			print("Unrecognized Input.  Please try again")

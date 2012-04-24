@@ -37,19 +37,19 @@ class Node(object):
 						if parser.get("Node", "Type") == "asset":
 							self.addChild(AssetNode(child_path, dirInfoFileName))
 						elif parser.get("Node", "Type") == "shot":
-							self.addChild(ShotNode(child_path, dirInfoFileName))
+							self.addChild(ShotNode(child_path, dirInfoFileName, errorList))
 						elif parser.get("Node", "Type") == "animation":
 							self.addChild(AnimationNode(child_path, dirInfoFileName))
-						#elif parser.get("Node", "Type") == "fx":
-						#	self.addChild(FxNode(child_path, dirInfoFileName))
-						#elif parser.get("Node", "Type") == "charfx":
-						#	self.addChild(CharfxNode(child_path, dirInfoFileName))
-						#elif parser.get("Node", "Type") == "lighting":
-						#	self.addChild(LightingNode(child_path, dirInfoFileName))
-						#elif parser.get("Node", "Type") == "compositing":
-						#	self.addChild(CompositingNode(child_path, dirInfoFileName))
-						#elif parser.get("Node", "Type") == "custom":
-						#	self.addChild(CustomNode(child_path, dirInfoFileName))
+						elif parser.get("Node", "Type") == "fx":
+							self.addChild(FXNode(child_path, dirInfoFileName))
+						elif parser.get("Node", "Type") == "charfx":
+							self.addChild(CharFXNode(child_path, dirInfoFileName))
+						elif parser.get("Node", "Type") == "lighting":
+							self.addChild(LightingNode(child_path, dirInfoFileName))
+						elif parser.get("Node", "Type") == "compositing":
+							self.addChild(CompositingNode(child_path, dirInfoFileName))
+						elif parser.get("Node", "Type") == "custom":
+							self.addChild(CustomNode(child_path, dirInfoFileName))
 						else:
 							raise Exception("Unrecognized Node Type.")
 							
@@ -104,13 +104,20 @@ class Node(object):
 			
 		self._fullPath = path
 		self._name = path.split('/')[-1]
+		print self._name
 		self._parent = path.split('/')[-2]
 		self._children = []
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Prevent Cyclic Dependencies
 #from versionedNode import VersionedNode
-from subNode import SubNode
-from assetNode import AssetNode
-from shotNode import ShotNode
 from animationNode import AnimationNode
+from assetNode import AssetNode
+from charfxNode import CharFXNode
+from compositingNode import CompositingNode
+from customNode import CustomNode
+from fxNode import FXNode
+from lightingNode import LightingNode
+from shotNode import ShotNode
+from subNode import SubNode
+
 from ..visitors.visitor import Visitor
