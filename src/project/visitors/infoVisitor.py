@@ -18,12 +18,12 @@ class InfoVisitor(Visitor):
 		
 		if isinstance(curNode, VersionedNode):
 			print ("Version Info:")
-			print ("\tLatest Version:", curNode.getLatestVersion())
-			print ("\tLocked: ", curNode.isLocked())
-			print ("\tLastCheckoutTime: ", curNode.getLastCheckoutTime())
-			print ("\tLastCheckoutUser: ", curNode.getLastCheckoutUser())
-			print ("\tLastCheckinTime: ", curNode.getLastCheckinTime())
-			print ("\tLastCheckinUser: ", curNode.getLastCheckinUser())
+			print ("\tLatest Version: %s" % curNode.getLatestVersion())
+			print ("\tLocked: %s" % curNode.isLocked())
+			print ("\tLastCheckoutTime: %s" % curNode.getLastCheckoutTime())
+			print ("\tLastCheckoutUser: %s" % curNode.getLastCheckoutUser())
+			print ("\tLastCheckinTime: %s" % curNode.getLastCheckinTime())
+			print ("\tLastCheckinUser: %s" % curNode.getLastCheckinUser())
 			
 		print ("-----")
 
