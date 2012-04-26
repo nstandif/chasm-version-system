@@ -1,0 +1,18 @@
+import sys, os, re
+
+#################################################################### 
+def main():
+	dir = "."
+	fileList = os.listdir(dir)
+	for x in fileList:
+		temp = x.split(" ")
+		if ".ICO" in temp[-1]:
+			if temp[-1] == ".ICO":
+				os.rename(os.path.join(dir, x), os.path.join(dir, temp[-2] + temp[-1])
+			else:
+				os.rename(os.path.join(dir, x), os.path.join(dir, temp[-1]))
+		
+
+####################################################################
+if __name__ == "__main__": 
+    main()

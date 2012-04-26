@@ -13,7 +13,8 @@ class RootNode(Node):
 	
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
 	def checkIntegrity(self):
-		print ("Checking RootNode integrity...")
+		#RootNode has no restrictions on its children.
+		#Recommended folders are assets, sequences, and global.
 		return True
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initialize Node	

@@ -2,9 +2,9 @@ import os
 import os.path
 import ConfigParser
 import time
-from node import Node
+import node
 
-class VersionedNode(Node):
+class VersionedNode(node.Node):
 	"""
 	ABSTRACT. Inherits from Node. Representative of a project category folder.
 	
@@ -14,7 +14,6 @@ class VersionedNode(Node):
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
 	#Load versioning information
 	def __loadMetaData(self, dirInfoFileName):
-		print ("Loading VersionedNode Data...")
 		parser = ConfigParser.ConfigParser()
 		parser.read(os.path.join(self._fullPath, dirInfoFileName))
 		if not parser.has_section("Versioning"):
@@ -34,7 +33,6 @@ class VersionedNode(Node):
 			self._lastCheckinUser = parser.get("Versioning", "LastCheckinUser")
 	
 	def checkIntegrity(self):
-		print "Checking Versioning integrity..."
 		if not os.path.exists(self._fullPath + "/src") or \
 				not os.path.exists(self._fullPath + "/inst") or \
 				not os.path.exists(self._fullPath + "/inst/latest") or \
@@ -131,3 +129,13 @@ class VersionedNode(Node):
 		self._lastCheckinUser = ""
 		
 		self.__loadMetaData(dirInfoFileName)
+
+"""
+Methods not bound to an instance of the class:
+"""
+def createOnDisk(path, name):
+	node.createOnDisk(path, name)
+	newPath = os.path.join(path, name)
+	os.mkdir(os.path.join(newPath, "src"))
+	os.mkdir(os.path.join(newPath, "inst"))
+	

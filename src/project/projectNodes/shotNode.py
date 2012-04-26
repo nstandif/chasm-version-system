@@ -10,9 +10,7 @@ class ShotNode(Node):
 	"""
 	
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
-	def checkIntegrity(self):
-		print "Checking ShotNode integrity..."
-		
+	def checkIntegrity(self):		
 		children = os.listdir(self._fullPath)
 		validChildren = ["animation", "fx", "charfx", "lighting", "compositing", "custom"]
 		

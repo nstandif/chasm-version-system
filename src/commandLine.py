@@ -19,8 +19,6 @@ def run():
 		proj = Project()
 		print ("Configuring Project...")
 		proj.config()
-		print ("Loading Project...")
-		proj.load()
 	
 	except Exception as e:
 		print "Error:", e
@@ -42,9 +40,33 @@ def run():
 		elif raw == 'checkin':
 			print("checkin not yet implemented.")
 		
+		elif raw == 'new':
+			print ("Specify the path, starting from the root directory:")
+			temp = raw_input()
+			if os.path.exists(os.path.join(proj.getProjectDir(), temp)):
+				print ("What do you want to name the folder?")
+				temp2 = raw_input()
+				print ("What type of folder do you want to create?")
+				print ("1 - Sub Folder")
+				print ("2 - Asset Folder")
+				print ("3 - Shot Folder")
+				print ("4 - Animation Folder")
+				print ("5 - CharFX Folder")
+				print ("6 - FX Folder")
+				print ("7 - Lighting Folder")
+				print ("8 - Compositing Folder")
+				temp3 = raw_input()
+				proj.mkDir(temp, temp2, temp3)
+			else:
+				print ("The specified path does not exist.")
+		
 		elif raw == 'stats':
-			root = proj.getRootNode()
-			root.preVisit(InfoVisitor())
+			try:
+				proj.load()
+				root = proj.getRootNode()
+				root.preVisit(InfoVisitor())
+			except Exception as e:
+				print e
 		
 		elif raw == 'clear':
 			os.system("clear")

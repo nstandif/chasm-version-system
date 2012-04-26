@@ -15,7 +15,6 @@ class Node(object):
 		raise NotImplementedError
 	
 	def _loadChildren(self):
-		print "Loading Children..."
 		errorList = []
 		dirInfoFileName = '.nodeInfo'
 		parser = ConfigParser.ConfigParser()
@@ -107,6 +106,15 @@ class Node(object):
 		self._parent = path.split(os.path.sep)[-2]
 		self._children = []
 
+"""
+Methods not bound to an instance of the class:
+"""
+def createOnDisk(path, name):
+	newPath = os.path.join(path, name)
+	os.mkdir(newPath)
+	#print "Created Folder: ", newPath
+	
+	
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Prevent Cyclic Dependencies
 #from versionedNode import VersionedNode
 from animationNode import AnimationNode
