@@ -17,6 +17,9 @@ class RootNode(Node):
 		#Recommended folders are assets, sequences, and global.
 		return True
 
+	def getErrorList(self):
+		return errorList
+
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initialize Node	
 	#Constructor
 	def __init__(self, path):
@@ -28,4 +31,3 @@ class RootNode(Node):
 			print "\nErrors occurred while loading:"
 			for x in errorList:
 				print x
-		

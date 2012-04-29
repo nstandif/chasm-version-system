@@ -111,7 +111,10 @@ Methods not bound to an instance of the class:
 """
 def createOnDisk(path, name):
 	newPath = os.path.join(path, name)
-	os.mkdir(newPath)
+	if os.path.exists(newPath):
+		raise Exception("Folder Already Exists: ", newPath)
+	else:
+		os.mkdir(newPath)
 	#print "Created Folder: ", newPath
 	
 	
@@ -127,4 +130,5 @@ from lightingNode import LightingNode
 from shotNode import ShotNode
 from subNode import SubNode
 
+from ..project import Project
 from ..visitors.visitor import Visitor

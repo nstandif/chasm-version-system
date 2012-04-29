@@ -14,11 +14,16 @@ def run():
 	* Initialize the Chasm Project.
 	* Continually process input from the user for testing purposes.
 	"""
+	
 	try:
 		print ("Creating New Project...")
 		proj = Project()
 		print ("Configuring Project...")
-		proj.config()
+		#proj.config()
+		if len(sys.argv) == 2 and os.path.exists(str(sys.argv[1])):
+			proj.config(str(sys.argv[1]))
+		else:
+			proj.config('.config.ini')
 	
 	except Exception as e:
 		print "Error:", e
@@ -70,7 +75,7 @@ def run():
 		
 		elif raw == 'clear':
 			os.system("clear")
-		
+			
 		else:
 			print("Unrecognized Input.  Please try again")
 

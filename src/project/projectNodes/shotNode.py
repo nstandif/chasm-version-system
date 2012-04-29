@@ -1,6 +1,9 @@
 import os
 import os.path
+import node
 from node import Node
+
+#TODO should this inherit from versionedNode instead?  It has a .nodeInfo file associated with it
 
 class ShotNode(Node):
 	"""
@@ -35,4 +38,10 @@ Valid folders are: animation, fx, charfx, lighting, compositing, and custom.")
 		super(ShotNode, self).__init__(path)
 		self.checkIntegrity()
 		errorList.extend(self._loadChildren())
-		
+
+"""
+Methods not bound to an instance of the class:
+"""
+def createOnDisk(path, name):
+	#TODO .nodeInfo ???
+	node.createOnDisk(path, name)

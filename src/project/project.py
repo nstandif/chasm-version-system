@@ -1,9 +1,6 @@
 
 import sys, os, os.path
 import ConfigParser
-from projectNodes import rootNode
-from projectNodes import subNode
-
 
 ##TODO: define __all__ in the __init__.py for projectNodes.
 ##TODO: Perhaps refactor the path stuff into a "PathFactory" of sorts.  This could also handle path validation
@@ -26,7 +23,7 @@ class Project:
 	
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Project Prep Functions
 	
-	def config(self):
+	def config(self, configfile):
 		"""
 		Configures the Project based on the .config.ini file found in the
 		program's root directory. This function uses the ConfigParser python
@@ -39,8 +36,7 @@ class Project:
 			Name, User's Name, Project Directory, and Local Directory.
 		"""
 		
-		filename = '.config.ini'
-		#filename = '.winConfig.ini'
+		filename = configfile
 		cp = ConfigParser.ConfigParser()
 		cp.read(filename)
 		
@@ -104,6 +100,12 @@ class Project:
 	def getProjectDir(self):
 		return self._projectDir
 	
+	def setUserName(self, userName):
+		raise NotImplementedError
+
+	def getUserName(self):
+		return self._username
+	
 	def setLocalDir(self, path):
 		if not os.path.exists(os.path.expanduser(path)):
 			raise Exception("Local Project Directory does not exist.")
@@ -126,22 +128,34 @@ class Project:
 		#print ("6 - FX Folder")
 		#print ("7 - Lighting Folder")
 		#print ("8 - Compositing Folder")
+		#print os.path.join(self.getProjectDir(), relPath)
 		if nodeType == "1":
-			subNode.createOnDisk(os.path.join(self.getProjectDir(), os.path.join(relPath.split(os.sep))[0]), name)
+			subNode.createOnDisk(os.path.join(self.getProjectDir(), relPath), name)
 		elif nodeType == "2":
-			assetNode.createOnDisk(os.path.join(self.getProjectDir(), os.path.split(relPath)), name)
+			assetNode.createOnDisk(os.path.join(self.getProjectDir(), relPath), name)
 		elif nodeType == "3":
-			shotNode.createOnDisk(os.path.join(self.getProjectDir(), os.path.split(relPath)), name)
+			shotNode.createOnDisk(os.path.join(self.getProjectDir(), relPath), name)
 		elif nodeType == "4":
-			animationNode.createOnDisk(os.path.join(self.getProjectDir(), os.path.split(relPath)), name)
+			animationNode.createOnDisk(os.path.join(self.getProjectDir(), relPath), name)
 		elif nodeType == "5":
-			charfxNode.createOnDisk(os.path.join(self.getProjectDir(), os.path.split(relPath)), name)
+			charfxNode.createOnDisk(os.path.join(self.getProjectDir(), relPath), name)
 		elif nodeType == "6":
-			fxNode.createOnDisk(os.path.join(self.getProjectDir(), os.path.split(relPath)), name)
+			fxNode.createOnDisk(os.path.join(self.getProjectDir(), relPath), name)
 		elif nodeType == "7":
-			lightingNode.createOnDisk(os.path.join(self.getProjectDir(), os.path.split(relPath)), name)
+			lightingNode.createOnDisk(os.path.join(self.getProjectDir(), relPath), name)
 		elif nodeType == "8":
-			compositingNode.createOnDisk(os.path.join(self.getProjectDir(), os.path.split(relPath)), name)
+			compositingNode.createOnDisk(os.path.join(self.getProjectDir(), relPath), name)
 		else:
 			raise Exception("Please enter a number 1-8. ")
 		return
+
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Prevent Cyclic Dependencies
+from projectNodes import rootNode
+from projectNodes import subNode
+from projectNodes import assetNode
+from projectNodes import shotNode
+from projectNodes import animationNode
+from projectNodes import charfxNode
+from projectNodes import fxNode
+from projectNodes import lightingNode
+from projectNodes import compositingNode

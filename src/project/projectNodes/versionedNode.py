@@ -8,7 +8,7 @@ class VersionedNode(node.Node):
 	"""
 	ABSTRACT. Inherits from Node. Representative of a project category folder.
 	
-	@author: Morgan Strong
+	@author: Morgan Strong, Brian Kingery
 	"""
 	
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
@@ -34,9 +34,9 @@ class VersionedNode(node.Node):
 	
 	def checkIntegrity(self):
 		if not os.path.exists(self._fullPath + "/src") or \
-				not os.path.exists(self._fullPath + "/inst") or \
-				not os.path.exists(self._fullPath + "/inst/latest") or \
-				not os.path.exists(self._fullPath + "/inst/stable"):
+				not os.path.exists(os.path.join(self._fullPath, "inst")) or \
+				not os.path.exists(os.path.join(self._fullPath, "inst", "latest")) or \
+				not os.path.exists(os.path.join(self._fullPath, "inst", "stable")):
 			raise Exception("Versioned Folder: " + self._fullPath + " is missing a critical folder/link.")
 		if not os.path.exists(os.path.join(self._fullPath, "src", "v"+str(self._latestVersion))):
 			raise Exception("Versioned Folder: " + self._name + "'s latest version number doesn't match any folder name in src.")
@@ -47,7 +47,7 @@ class VersionedNode(node.Node):
 		#May not need to do anything, but should at least override _loadChildren
 		#from Node.
 		return
-		
+	
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>> API Functions
 	def getLatestVersion(self):
 		return self._latestVersion
@@ -129,6 +129,9 @@ class VersionedNode(node.Node):
 		self._lastCheckinUser = ""
 		
 		self.__loadMetaData(dirInfoFileName)
+	
+	def test(self):
+		raise notImplementedError
 
 """
 Methods not bound to an instance of the class:
@@ -136,6 +139,31 @@ Methods not bound to an instance of the class:
 def createOnDisk(path, name):
 	node.createOnDisk(path, name)
 	newPath = os.path.join(path, name)
-	os.mkdir(os.path.join(newPath, "src"))
-	os.mkdir(os.path.join(newPath, "inst"))
+	os.mkdir(os.path.join(newPath, 'src'))
+	os.mkdir(os.path.join(newPath, 'inst'))
+	os.symlink(os.path.join(newPath, 'inst', 'null'), os.path.join(newPath, 'inst', 'latest'))
+	os.symlink(os.path.join(newPath, 'inst', 'null'), os.path.join(newPath, 'inst','stable'))
+	
+	#Build .nodeInfo config file. Node:Type must be set by concrete modules
+	#TODO figure out how to use the project instead of the config.ini
+	config = ConfigParser.ConfigParser()
+	config.read('.config.ini')
+	username = config.get('User', 'Name')
+	timestamp = time.strftime("%a, %d %b %Y %I:%M:%S %p", time.gmtime())
+	
+	nodeInfo = ConfigParser.ConfigParser()
+	nodeInfo.add_section('Node')
+	nodeInfo.set('Node', 'Type', '')
+	
+	nodeInfo.add_section('Versioning')
+	nodeInfo.set('Versioning', 'LatestVersion', '0')
+	nodeInfo.set('Versioning', 'Locked', 'False')
+	nodeInfo.set('Versioning', 'LastCheckoutTime', timestamp)
+	nodeInfo.set('Versioning', 'LastCheckoutUser', username)
+	nodeInfo.set('Versioning', 'LastCheckinTime', timestamp)
+	#nodeInfo.set('Versioning', 'LastCheckinUser', node.Project.getUserName())
+	nodeInfo.set('Versioning', 'LastCheckinUser', username)
+	
+	with open(os.path.join(newPath, ".nodeInfo"), 'wb') as configFile:
+		nodeInfo.write(configFile)
 	

@@ -4,25 +4,25 @@ import ConfigParser
 import versionedNode
 from versionedNode import VersionedNode
 
-#TODO shotNode stuff???
+#TODO shotNode Stuff???
 
-class FXNode(VersionedNode):
-	"""
-	Concrete. Inherits from Node. Representative of a project asset folder.
-	
-	@author: Morgan Strong, Brian Kingery
-	"""
-	
+class LightingNode(VersionedNode):
+    """
+    Concrete. Inherits from VersionedNode. Representative of a lighting folder.
+    
+    @author: Brian Kingery, Morgan Strong
+    """
+
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Define Functions	
-	def checkIntegrity(self):
-		super(FXNode, self).checkIntegrity()
+    def checkIntegrity(self):
+        super(LightingNode, self).checkIntegrity()
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initialize Node	
-	#Constructor
-	def __init__(self, path, dirInfoFileName):
-		super(FXNode, self).__init__(path, dirInfoFileName)
-		self.checkIntegrity()
-		self._loadChildren()
+    #Constructor
+    def __init__(self, path, dirInfoFileName):
+    	super(LightingNode, self).__init__(path, dirInfoFileName)
+    	self.checkIntegrity()
+    	self._loadChildren()
 
 """
 Methods not bound to an instance of the class:
@@ -33,7 +33,7 @@ def createOnDisk(path, name):
 	#Set the node type in .nodeInfo
 	nodeInfo = ConfigParser.ConfigParser()
 	nodeInfo.read(os.path.join(path, name, ".nodeInfo"))
-	nodeInfo.set('Node', 'Type', 'fx')
+	nodeInfo.set('Node', 'Type', 'lighting')
 	
 	with open(os.path.join(path, name, ".nodeInfo"), 'wb') as configFile:
 		nodeInfo.write(configFile)
