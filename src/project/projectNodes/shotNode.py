@@ -21,7 +21,7 @@ class ShotNode(Node):
 		for x in children:
 			if x in validChildren:
 				toRemove.append(x)
-			elif not os.path.isdir(self._fullPath + "/" + x):
+			elif not os.path.isdir(os.path.join(self._fullPath, x)):
 				toRemove.append(x)
 		for x in toRemove:
 			children.remove(x)

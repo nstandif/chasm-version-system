@@ -35,8 +35,8 @@ class VersionedNode(node.Node):
 	def checkIntegrity(self):
 		if not os.path.exists(self._fullPath + "/src") or \
 				not os.path.exists(os.path.join(self._fullPath, "inst")) or \
-				not os.path.exists(os.path.join(self._fullPath, "inst", "latest")) or \
-				not os.path.exists(os.path.join(self._fullPath, "inst", "stable")):
+				not os.path.islink(os.path.join(self._fullPath, "inst", "latest")) or \
+				not os.path.islink(os.path.join(self._fullPath, "inst", "stable")):
 			raise Exception("Versioned Folder: " + self._fullPath + " is missing a critical folder/link.")
 		if not os.path.exists(os.path.join(self._fullPath, "src", "v"+str(self._latestVersion))):
 			raise Exception("Versioned Folder: " + self._name + "'s latest version number doesn't match any folder name in src.")
@@ -136,19 +136,27 @@ class VersionedNode(node.Node):
 """
 Methods not bound to an instance of the class:
 """
+def getNullReference():
+	"""@returns: The path to the .nullReference file used for symlinks"""
+	if not os.path.exists(os.path.join(node.Project().getProjectDir(), '.nullReference')):
+		nullRef = open(os.path.join(node.Project().getProjectDir(), '.nullReference'), "w")
+		nullRef.write("#This is a null reference for symlinks.\n#Nothing has been installed.")
+		nullRef.close()
+	return os.path.join(node.Project().getProjectDir(), '.nullReference')
+
 def createOnDisk(path, name):
 	node.createOnDisk(path, name)
 	newPath = os.path.join(path, name)
 	os.mkdir(os.path.join(newPath, 'src'))
+	os.mkdir(os.path.join(newPath, 'src', 'v0'))
 	os.mkdir(os.path.join(newPath, 'inst'))
-	os.symlink(os.path.join(newPath, 'inst', 'null'), os.path.join(newPath, 'inst', 'latest'))
-	os.symlink(os.path.join(newPath, 'inst', 'null'), os.path.join(newPath, 'inst','stable'))
+	#os.symlink(os.path.join(newPath, 'inst', 'null'), os.path.join(newPath, 'inst', 'latest'))
+	#os.symlink(os.path.join(newPath, 'inst', 'null'), os.path.join(newPath, 'inst','stable'))
+	os.symlink(os.path.join(newPath, 'inst', getNullReference()), os.path.join(newPath, 'inst', 'latest'))
+	os.symlink(os.path.join(newPath, 'inst', getNullReference()), os.path.join(newPath, 'inst','stable'))
 	
 	#Build .nodeInfo config file. Node:Type must be set by concrete modules
-	#TODO figure out how to use the project instead of the config.ini
-	config = ConfigParser.ConfigParser()
-	config.read('.config.ini')
-	username = config.get('User', 'Name')
+	username = node.Project().getUserName()
 	timestamp = time.strftime("%a, %d %b %Y %I:%M:%S %p", time.gmtime())
 	
 	nodeInfo = ConfigParser.ConfigParser()
@@ -161,7 +169,6 @@ def createOnDisk(path, name):
 	nodeInfo.set('Versioning', 'LastCheckoutTime', timestamp)
 	nodeInfo.set('Versioning', 'LastCheckoutUser', username)
 	nodeInfo.set('Versioning', 'LastCheckinTime', timestamp)
-	#nodeInfo.set('Versioning', 'LastCheckinUser', node.Project.getUserName())
 	nodeInfo.set('Versioning', 'LastCheckinUser', username)
 	
 	with open(os.path.join(newPath, ".nodeInfo"), 'wb') as configFile:

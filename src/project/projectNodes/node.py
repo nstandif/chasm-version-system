@@ -21,16 +21,16 @@ class Node(object):
 		
 		for x in os.listdir(self._fullPath):
 			try:
-				child_path = self._fullPath + "/" + x
+				child_path = os.path.join(self._fullPath, x)
 				if os.path.isdir(child_path):
-					if not os.path.exists(child_path + "/.nodeInfo"):
+					if not os.path.exists(os.path.join(child_path, dirInfoFileName)):
 						self.addChild(SubNode(child_path, errorList))
 					else:
-						parser.read(child_path + "/" + dirInfoFileName)
+						parser.read(os.path.join(child_path, dirInfoFileName))
 						
 						#Check integrity of metaData file.
 						if not parser.has_section("Node") or not parser.has_option("Node", "Type"):
-							raise Exception("File corrupted: " + child_path + "/" + dirInfoFileName)
+							raise Exception("File corrupted: " + os.path.join(child_path, dirInfoFileName))
 						
 						#Switch on "Type" attribute to create type of node.
 						if parser.get("Node", "Type") == "asset":
@@ -130,5 +130,6 @@ from lightingNode import LightingNode
 from shotNode import ShotNode
 from subNode import SubNode
 
-from ..project import Project
 from ..visitors.visitor import Visitor
+
+from ..project import Project

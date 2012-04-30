@@ -5,12 +5,13 @@ import ConfigParser
 ##TODO: define __all__ in the __init__.py for projectNodes.
 ##TODO: Perhaps refactor the path stuff into a "PathFactory" of sorts.  This could also handle path validation
 
-class Project:
+class _Project:
 	"""
+	Singleton: Use project.Project() to instantiate this class
 	This class represents the entirety of an animation project. It contains a
 	list of folder nodes, project properties, etc.
 	
-	@author: Morgan Strong
+	@author: Morgan Strong, Brian Kingery
 	"""
 	
 	#Constructor
@@ -21,7 +22,7 @@ class Project:
 		self._projectDir = ""
 		self._localDir = ""
 	
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Project Prep Functions
+	# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Project Prep Functions
 	
 	def config(self, configfile):
 		"""
@@ -85,7 +86,7 @@ class Project:
 		self._node = rootNode.RootNode(self._projectDir)
 	
 
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>> API Functions
+	# >>>>>>>>>>>>>>>>>>>>>>>>>>>> API Functions
 	def getName(self):
 		return self._name
 	
@@ -148,6 +149,15 @@ class Project:
 		else:
 			raise Exception("Please enter a number 1-8. ")
 		return
+
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Sudo Singleton
+#Creates and stores an instance of the project
+_project = _Project()
+def Project():
+	"""
+	Use this function to get the project.
+	@returns: The one and only instance of the Project"""
+	return _project
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Prevent Cyclic Dependencies
 from projectNodes import rootNode

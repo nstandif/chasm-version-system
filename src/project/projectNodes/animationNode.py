@@ -8,7 +8,7 @@ from versionedNode import VersionedNode
 
 class AnimationNode(VersionedNode):
 	"""
-	Concrete. Inherits from Node. Representative of a project asset folder.
+	Concrete. Inherits from Node. Representative of a project animation folder.
 	
 	@author: Morgan Strong, Brian Kingery
 	"""
@@ -33,7 +33,8 @@ Methods not bound to an instance of the class:
 def createOnDisk(path, name):
 	versionedNode.createOnDisk(path, name)
 	
-	#TODO its not creating it in the correct directory
+	os.mkdir(os.path.join(path, name, 'cache'))
+	
 	#Set the node type in .nodeInfo
 	nodeInfo = ConfigParser.ConfigParser()
 	nodeInfo.read(os.path.join(path, name, ".nodeInfo"))

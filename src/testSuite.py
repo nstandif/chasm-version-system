@@ -5,6 +5,7 @@ from project.visitors.infoVisitor import InfoVisitor
 def nodeCreationTest():
     """
     Test the creation of each concreat node type
+    @author Brian Kingery
     """
     try:
         print ("Creating New Project...")
@@ -49,9 +50,10 @@ def nodeCreationTest():
     except Exception as e:
         print e
     
-    errors = root.getErrorList()
-    if errorList:
-        print ("\nCreation Failed!!!\nErrors occurre while loading")
+    #TODO fix this
+    #errors = root.getErrorList()
+    #if errorList:
+    #    print ("\nCreation Failed!!!\nErrors occurre while loading")
 
 if __name__ == '__main__':
     # Someone is launching this directly

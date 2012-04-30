@@ -18,7 +18,7 @@ class RootNode(Node):
 		return True
 
 	def getErrorList(self):
-		return errorList
+		return self.errorList
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Initialize Node	
 	#Constructor

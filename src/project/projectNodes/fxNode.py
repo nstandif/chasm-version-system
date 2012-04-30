@@ -8,7 +8,7 @@ from versionedNode import VersionedNode
 
 class FXNode(VersionedNode):
 	"""
-	Concrete. Inherits from Node. Representative of a project asset folder.
+	Concrete. Inherits from Node. Representative of a project fx folder.
 	
 	@author: Morgan Strong, Brian Kingery
 	"""
