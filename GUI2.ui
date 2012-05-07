@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>654</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Chasm Project Utility</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources/chasm_resources.qrc">
+    <normaloff>:/chasm/ICO_Files/Network/Disconnected.ICO</normaloff>:/chasm/ICO_Files/Network/Disconnected.ICO</iconset>
+  </property>
+  <widget class="QWidget" name="mainWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QTabWidget" name="fileTabs">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="localFilesTab">
+       <attribute name="title">
+        <string>My Checked Out Files</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="margin">
+         <number>5</number>
+        </property>
+        <item>
+         <widget class="QTreeWidget" name="treeWidget">
+          <attribute name="headerDefaultSectionSize">
+           <number>200</number>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>File Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Check Out Time</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Last Opened</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="projectFilesTab">
+       <attribute name="title">
+        <string>Project Files</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="margin">
+         <number>5</number>
+        </property>
+        <item>
+         <widget class="QTreeWidget" name="projectFilesTreeWidget">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
+          <attribute name="headerDefaultSectionSize">
+           <number>120</number>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>File Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Locked</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Checked In by:</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Check In Time:</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Ready For Use</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="sizeGripEnabled">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::AllToolBarAreas</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>48</width>
+     <height>48</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>RightToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+   <addaction name="actionCheckout"/>
+   <addaction name="actionInstall"/>
+   <addaction name="separator"/>
+   <addaction name="actionCheckin"/>
+   <addaction name="actionOpen_File"/>
+   <addaction name="separator"/>
+   <addaction name="actionCache_to_Alembic"/>
+   <addaction name="actionUpdate_Plugins"/>
+   <addaction name="separator"/>
+   <addaction name="actionSettings"/>
+  </widget>
+  <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="resources/chasm_resources.qrc">
+     <normaloff>:/chasm/PNG_Files/Hardware/Computer.PNG</normaloff>:/chasm/PNG_Files/Hardware/Computer.PNG</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Configure Your Settings</string>
+   </property>
+  </action>
+  <action name="actionCheckout">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources/chasm_resources.qrc">
+     <normaloff>:/chasm/PNG_Files/Misc/Download.PNG</normaloff>:/chasm/PNG_Files/Misc/Download.PNG</iconset>
+   </property>
+   <property name="text">
+    <string>Checkout</string>
+   </property>
+   <property name="toolTip">
+    <string>Checkout Project File</string>
+   </property>
+  </action>
+  <action name="actionCheckin">
+   <property name="icon">
+    <iconset resource="resources/chasm_resources.qrc">
+     <normaloff>:/chasm/PNG_Files/Misc/Upload.PNG</normaloff>:/chasm/PNG_Files/Misc/Upload.PNG</iconset>
+   </property>
+   <property name="text">
+    <string>Checkin</string>
+   </property>
+   <property name="toolTip">
+    <string>Checkin a Local File</string>
+   </property>
+  </action>
+  <action name="actionCache_to_Alembic">
+   <property name="icon">
+    <iconset resource="resources/chasm_resources.qrc">
+     <normaloff>:/chasm/PNG_Files/Misc/alembic_logo_Darkest.png</normaloff>:/chasm/PNG_Files/Misc/alembic_logo_Darkest.png</iconset>
+   </property>
+   <property name="text">
+    <string>Alembic</string>
+   </property>
+  </action>
+  <action name="actionInstall">
+   <property name="icon">
+    <iconset resource="resources/chasm_resources.qrc">
+     <normaloff>:/chasm/PNG_Files/Folders/Favourites.PNG</normaloff>:/chasm/PNG_Files/Folders/Favourites.PNG</iconset>
+   </property>
+   <property name="text">
+    <string>Install</string>
+   </property>
+   <property name="toolTip">
+    <string>Install / Flatten a File</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Plugins">
+   <property name="icon">
+    <iconset resource="resources/chasm_resources.qrc">
+     <normaloff>:/chasm/PNG_Files/Misc/Search.PNG</normaloff>:/chasm/PNG_Files/Misc/Search.PNG</iconset>
+   </property>
+   <property name="text">
+    <string>Update Plugins</string>
+   </property>
+   <property name="toolTip">
+    <string>Update Project Plugins</string>
+   </property>
+  </action>
+  <action name="actionOpen_File">
+   <property name="icon">
+    <iconset resource="resources/chasm_resources.qrc">
+     <normaloff>:/chasm/PNG_Files/File_Formats/format.PNG</normaloff>:/chasm/PNG_Files/File_Formats/format.PNG</iconset>
+   </property>
+   <property name="text">
+    <string>Open File</string>
+   </property>
+   <property name="toolTip">
+    <string>Open a Local or Project File in Maya or Houdini</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="resources/chasm_resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
