@@ -40,5 +40,4 @@ def createOnDisk(path, name):
 	nodeInfo.read(os.path.join(path, name, ".nodeInfo"))
 	nodeInfo.set('Node', 'Type', 'animation')
 	
-	with open(os.path.join(path, name, ".nodeInfo"), 'wb') as configFile:
-		nodeInfo.write(configFile)
+	versionedNode.updateConfigFile(os.path.join(path, name, ".nodeInfo"), nodeInfo)
