@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="chasm">
+    <file>PNG_Files/Misc/alembic_logo_Darkest.png</file>
     <file>PNG_Files/File_Formats/AVI.PNG</file>
     <file>PNG_Files/File_Formats/BMP.PNG</file>
     <file>PNG_Files/File_Formats/CSS.PNG</file>
