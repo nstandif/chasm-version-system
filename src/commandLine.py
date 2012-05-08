@@ -40,10 +40,38 @@ def run():
 			break
 		
 		elif raw == 'checkout':
-			print("checkout not yet implemented.")
+			print("Specify the path, starting from the root directory:")
+			temp = raw_input()
+			coPath = os.path.join(proj.getProjectDir(), temp)
+			if os.path.exists(coPath):
+				print("Do you want to lock this folder? (y/n):")
+				resp = raw_input()
+				#TODO
+				#except OSError as exc:
+				#	if exc.errno == errno.EEXIST:
+				try:
+					if resp == "y":
+						proj.checkout(coPath, True)
+					elif resp == "n":
+						proj.checkout(coPath, False)
+				except Exception as e:
+					print "Error:", e
+			else:
+				print("The specified path does not exist.")
+				
 		
 		elif raw == 'checkin':
-			print("checkin not yet implemented.")
+			print("Specify the folder you wish to checkin:")
+			temp = raw_input()
+			toCheckin = os.path.join(proj.getLocalDir(), temp)
+			if os.path.exists(toCheckin):
+				#TODO catch exception and add override functionality
+				if(proj.canCheckin(toCheckin)):
+					proj.checkin(toCheckin)
+				else:
+					print("Can not checkin: file is locked or newer verion is available")
+			else:
+				print("The specified path does not exist.")
 		
 		elif raw == 'new':
 			print ("Specify the path, starting from the root directory:")

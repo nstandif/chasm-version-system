@@ -1,6 +1,8 @@
 
 import sys, os, os.path
 import ConfigParser
+import time
+import shutil, errno
 
 ##TODO: define __all__ in the __init__.py for projectNodes.
 ##TODO: Perhaps refactor the path stuff into a "PathFactory" of sorts.  This could also handle path validation
@@ -120,6 +122,15 @@ class _Project:
 	def getRootNode(self):
 		return self._node
 	
+	def writeConfigFile(self, filePath, configParser):
+		"""
+		Will update the config file specified by filePath with the contents of configParser
+		@precondition: filePath is a valid path
+		@precondition: confgParser is an instance of ConfigParser()
+		"""
+		with open(filePath, 'wb') as configFile:
+			configParser.write(configFile)
+	
 	def mkDir(self, relPath, name, nodeType):
 		#print ("1 - Sub Folder")
 		#print ("2 - Asset Folder")
@@ -149,6 +160,125 @@ class _Project:
 		else:
 			raise Exception("Please enter a number 1-8. ")
 		return
+	
+	def _createCheckoutInfoFile(self, dirPath, coPath, version, timestamp, lock):
+		"""
+		Creates a .checkoutInfo file in the directory specified by dirPath
+		@precondition: dirPath is a valid path
+		@postcondition: dirPath/.checkoutInfo contains complete [Checkout] section
+		"""
+		chkoutInfo = ConfigParser.ConfigParser()
+		chkoutInfo.add_section("Checkout")
+		chkoutInfo.set("Checkout", "checkedoutfrom", coPath)
+		chkoutInfo.set("Checkout", "checkouttime", timestamp)
+		chkoutInfo.set("Checkout", "version", version)
+		chkoutInfo.set("Checkout", "lockedbyme", str(lock))
+		
+		self.writeConfigFile(os.path.join(dirPath, ".checkoutInfo"), chkoutInfo)
+		
+	
+	def checkout(self, coPath, lock):
+		"""
+		Copies the 'latest version' from the src folder into the local directory
+		@precondition: coPath is a path to a versioned folder
+		@precondition: lock is a boolean value
+		
+		@postcondition: A copy of the 'latest version' will be placed in the local directory
+			with the name of the versioned folder
+		@postdondition: If lock == True coPath will be locked until it is released by checkin
+		"""
+		if not os.path.exists(os.path.join(coPath, ".nodeInfo")):
+			raise Exception("Not a versioned folder.")
+		
+		nodeInfo = ConfigParser.ConfigParser()
+		nodeInfo.read(os.path.join(coPath, ".nodeInfo"))
+		
+		if nodeInfo.get("Versioning", "locked") == "False":
+			
+			version = nodeInfo.get("Versioning", "latestversion")
+			toCopy = os.path.join(coPath, "src", "v"+version)
+			dest = os.path.join(self.getLocalDir(), os.path.basename(coPath))
+			
+			if(os.path.exists(toCopy)):
+				
+				shutil.copytree(toCopy, dest) # Make the copy
+				
+				timestamp = time.strftime("%a, %d %b %Y %I:%M:%S %p", time.gmtime())
+				nodeInfo.set("Versioning", "lastcheckoutuser",self.getUserName())
+				nodeInfo.set("Versioning", "lastcheckouttime", timestamp)
+				nodeInfo.set("Versioning", "locked", str(lock))
+				
+				self.writeConfigFile(os.path.join(coPath, ".nodeInfo"), nodeInfo)
+				self._createCheckoutInfoFile(dest, coPath, version, timestamp, lock)
+			else:
+				raise Exception("Version doesn't exist "+toCopy)
+		else:
+			whoLocked = nodeInfo.get("Versioning", "lastcheckoutuser")
+			whenLocked = nodeInfo.get("Versioning", "lastcheckouttime")
+			raise Exception("Can not checkout. Folder is locked by "+whoLocked+" at "+whenLocked)
+	
+	def canCheckin(self, toCheckin):
+		"""
+		@returns: True if destination is not locked by another user
+			AND this checkin will not overwrite a newer version
+		"""
+		chkoutInfo = ConfigParser.ConfigParser()
+		chkoutInfo.read(os.path.join(toCheckin, ".checkoutInfo"))
+		chkInDest = chkoutInfo.get("Checkout", "checkedoutfrom")
+		version = chkoutInfo.getint("Checkout", "version")
+		lockedbyme = chkoutInfo.get("Checkout", "lockedbyme")
+		
+		nodeInfo = ConfigParser.ConfigParser()
+		nodeInfo.read(os.path.join(chkInDest, ".nodeInfo"))
+		locked = nodeInfo.getboolean("Versioning", "locked")
+		latestVersion = nodeInfo.getint("Versioning", "latestversion")
+		
+		#TODO raise different exceptions to give override options to the user
+		result = True
+		if lockedbyme == False:
+			if locked == True:
+				result = False
+			if verion < latestVersion:
+				result = False
+			
+		
+		return result
+	
+	def checkin(self, toCheckin):
+		"""
+		Checks a folder back in as the newest version
+		@precondition: toCheckin is a valid path
+		@precondition: canCheckin() == True OR all conflicts have been resolved
+		"""
+		chkoutInfo = ConfigParser.ConfigParser()
+		chkoutInfo.read(os.path.join(toCheckin, ".checkoutInfo"))
+		chkInDest = chkoutInfo.get("Checkout", "checkedoutfrom")
+		lockedbyme = chkoutInfo.getboolean("Checkout", "lockedbyme")
+		
+		nodeInfo = ConfigParser.ConfigParser()
+		nodeInfo.read(os.path.join(chkInDest, ".nodeInfo"))
+		locked = nodeInfo.getboolean("Versioning", "locked")
+		newVersion = nodeInfo.getint("Versioning", "latestversion") + 1
+		newVersionPath = os.path.join(chkInDest, "src", "v"+str(newVersion))
+		
+		if locked == True and lockedbyme == False:
+			raise Exception("Can not overwrite locked folder")
+		
+		# Checkin
+		shutil.copytree(toCheckin, newVersionPath)
+		
+		timestamp = time.strftime("%a, %d %b %Y %I:%M:%S %p", time.gmtime())
+		nodeInfo.set("Versioning", "lastcheckintime", timestamp)
+		nodeInfo.set("Versioning", "lastcheckinuser", self.getUserName)
+		nodeInfo.set("Versioning", "latestversion", str(newVersion))
+		nodeInfo.set("Versioning", "locked", "False")
+		self.writeConfigFile(os.path.join(chkInDest, ".nodeInfo"), nodeInfo)
+		
+		# Clean up
+		shutil.rmtree(toCheckin)
+		os.remove(os.path.join(newVersionPath, ".checkoutInfo"))
+		
+		
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Sudo Singleton
 #Creates and stores an instance of the project
@@ -156,7 +286,8 @@ _project = _Project()
 def Project():
 	"""
 	Use this function to get the project.
-	@returns: The one and only instance of the Project"""
+	@returns: The one and only instance of the Project
+	"""
 	return _project
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Prevent Cyclic Dependencies
