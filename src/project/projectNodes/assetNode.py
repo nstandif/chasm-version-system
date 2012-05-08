@@ -33,7 +33,9 @@ def createOnDisk(path, name):
 	nodeInfo.read(os.path.join(path, name, ".nodeInfo"))
 	nodeInfo.set('Node', 'Type', 'asset')
 	
-	with open(os.path.join(path, name, ".nodeInfo"), 'wb') as configFile:
-		nodeInfo.write(configFile)
+	versionedNode.updateConfigFile(os.path.join(path, name, ".nodeInfo"), nodeInfo)
+	
+	#with open(os.path.join(path, name, ".nodeInfo"), 'wb') as configFile:
+	#	nodeInfo.write(configFile)
 	#nodeInfo.write()
 	

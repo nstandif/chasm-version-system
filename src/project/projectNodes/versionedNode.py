@@ -144,18 +144,23 @@ def getNullReference():
 		nullRef.close()
 	return os.path.join(node.Project().getProjectDir(), '.nullReference')
 
-def createOnDisk(path, name):
-	node.createOnDisk(path, name)
-	newPath = os.path.join(path, name)
-	os.mkdir(os.path.join(newPath, 'src'))
-	os.mkdir(os.path.join(newPath, 'src', 'v0'))
-	os.mkdir(os.path.join(newPath, 'inst'))
-	#os.symlink(os.path.join(newPath, 'inst', 'null'), os.path.join(newPath, 'inst', 'latest'))
-	#os.symlink(os.path.join(newPath, 'inst', 'null'), os.path.join(newPath, 'inst','stable'))
-	os.symlink(os.path.join(newPath, 'inst', getNullReference()), os.path.join(newPath, 'inst', 'latest'))
-	os.symlink(os.path.join(newPath, 'inst', getNullReference()), os.path.join(newPath, 'inst','stable'))
-	
-	#Build .nodeInfo config file. Node:Type must be set by concrete modules
+def updateConfigFile(filePath, configParser):
+	"""
+	Will update the config file specified by filePath with the contents of configParser
+	@precondition: filePath is a valid path
+	@precondition: confgParser is an instance of ConfigParser()
+	"""
+	with open(filePath, 'wb') as configFile:
+		configParser.write(configFile)
+
+def createNodeInfoFile(dirPath):
+	"""
+	Creates the .nodeInfo file in the directory specified by dirPath.
+	The Node:Type must be set by concrete nodes
+	@precondition: dirPath is a valid directory
+	@postcondition: All sections/tags are created and set except "Type".
+		"Type" must be set by concrete nodes.
+	"""
 	username = node.Project().getUserName()
 	timestamp = time.strftime("%a, %d %b %Y %I:%M:%S %p", time.gmtime())
 	
@@ -171,6 +176,17 @@ def createOnDisk(path, name):
 	nodeInfo.set('Versioning', 'LastCheckinTime', timestamp)
 	nodeInfo.set('Versioning', 'LastCheckinUser', username)
 	
-	with open(os.path.join(newPath, ".nodeInfo"), 'wb') as configFile:
-		nodeInfo.write(configFile)
+	updateConfigFile(os.path.join(dirPath, ".nodeInfo"), nodeInfo)
+
+def createOnDisk(path, name):
+	node.createOnDisk(path, name)
+	newPath = os.path.join(path, name)
+	os.mkdir(os.path.join(newPath, 'src'))
+	os.mkdir(os.path.join(newPath, 'src', 'v0'))
+	os.mkdir(os.path.join(newPath, 'inst'))
+	#os.symlink(os.path.join(newPath, 'inst', 'null'), os.path.join(newPath, 'inst', 'latest'))
+	#os.symlink(os.path.join(newPath, 'inst', 'null'), os.path.join(newPath, 'inst','stable'))
+	os.symlink(os.path.join(newPath, 'inst', getNullReference()), os.path.join(newPath, 'inst', 'latest'))
+	os.symlink(os.path.join(newPath, 'inst', getNullReference()), os.path.join(newPath, 'inst','stable'))
 	
+	createNodeInfoFile(newPath)
