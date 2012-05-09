@@ -22,14 +22,14 @@ def runSettings():
 def tabSwitch(tabNum):
     print "Switched tab to", str(tabNum)
 
-def localItemSelectionChanged(item1, item2):
-    print "Local Item Selection Changed", str(item2)
+def localItemSelectionChanged():
+    print "Local Item Selection Changed"
 
 def localFilesContextMenu(point1):
     print "Local Item Context Menu", str(point1)
 
-def projectItemSelectionChanged(item1, item2):
-    print "Project Item Selection Changed", str(item2)
+def projectItemSelectionChanged():
+    print "Project Item Selection Changed"
 
 def projectFilesContextMenu(point1):
     print "Project Item Context Menu", str(point1)
