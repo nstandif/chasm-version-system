@@ -9,6 +9,7 @@
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+import os, types
 import controller
 
 try:
@@ -24,7 +25,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(900, 654)
         icon = QIcon()
-        icon.addPixmap(QPixmap(_fromUtf8("../resources/PNG_Files/Network/Disconnected.PNG")), QIcon.Normal, QIcon.Off)
+        icon.addPixmap(QPixmap(_fromUtf8(os.path.join("..","resources","PNG_Files","Network","Disconnected.PNG"))), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.mainWidget = QWidget(MainWindow)
         self.mainWidget.setObjectName(_fromUtf8("mainWidget"))
@@ -79,38 +80,38 @@ class Ui_MainWindow(object):
         MainWindow.addToolBar(Qt.RightToolBarArea, self.toolbar)
         self.actionSettings = QAction(MainWindow)
         icon1 = QIcon()
-        icon1.addPixmap(QPixmap(_fromUtf8("../resources/PNG_Files/Hardware/Computer.PNG")), QIcon.Normal, QIcon.Off)
+        icon1.addPixmap(QPixmap(_fromUtf8(os.path.join("..","resources","PNG_Files","Hardware","Computer.PNG"))), QIcon.Normal, QIcon.Off)
         self.actionSettings.setIcon(icon1)
         self.actionSettings.setObjectName(_fromUtf8("actionSettings"))
         self.actionCheckout = QAction(MainWindow)
         self.actionCheckout.setEnabled(True)
         icon2 = QIcon()
-        icon2.addPixmap(QPixmap(_fromUtf8("../resources/PNG_Files/Misc/Download.PNG")), QIcon.Normal, QIcon.Off)
+        icon2.addPixmap(QPixmap(_fromUtf8(os.path.join("..","resources","PNG_Files","Misc","Download.PNG"))), QIcon.Normal, QIcon.Off)
         self.actionCheckout.setIcon(icon2)
         self.actionCheckout.setObjectName(_fromUtf8("actionCheckout"))
         self.actionCheckin = QAction(MainWindow)
         icon3 = QIcon()
-        icon3.addPixmap(QPixmap(_fromUtf8("../resources/PNG_Files/Misc/Upload.PNG")), QIcon.Normal, QIcon.Off)
+        icon3.addPixmap(QPixmap(_fromUtf8(os.path.join("..","resources","PNG_Files","Misc","Upload.PNG"))), QIcon.Normal, QIcon.Off)        
         self.actionCheckin.setIcon(icon3)
         self.actionCheckin.setObjectName(_fromUtf8("actionCheckin"))
         self.actionCache_to_Alembic = QAction(MainWindow)
         icon4 = QIcon()
-        icon4.addPixmap(QPixmap(_fromUtf8("../resources/PNG_Files/Misc/alembic_logo_Darkest.png")), QIcon.Normal, QIcon.Off)
+        icon4.addPixmap(QPixmap(_fromUtf8(os.path.join("..","resources","PNG_Files","Misc","alembic_logo_Darkest.png"))), QIcon.Normal, QIcon.Off)
         self.actionCache_to_Alembic.setIcon(icon4)
         self.actionCache_to_Alembic.setObjectName(_fromUtf8("actionCache_to_Alembic"))
         self.actionInstall = QAction(MainWindow)
         icon5 = QIcon()
-        icon5.addPixmap(QPixmap(_fromUtf8("../resources/PNG_Files/Folders/Favourites.PNG")), QIcon.Normal, QIcon.Off)
+        icon5.addPixmap(QPixmap(_fromUtf8(os.path.join("..","resources","PNG_Files","Folders","Favourites.PNG"))), QIcon.Normal, QIcon.Off)
         self.actionInstall.setIcon(icon5)
         self.actionInstall.setObjectName(_fromUtf8("actionInstall"))
         self.actionUpdate_Plugins = QAction(MainWindow)
         icon6 = QIcon()
-        icon6.addPixmap(QPixmap(_fromUtf8("../resources/PNG_Files/Misc/Search.PNG")), QIcon.Normal, QIcon.Off)
+        icon6.addPixmap(QPixmap(_fromUtf8(os.path.join("..","resources","PNG_Files","Misc","Search.PNG"))), QIcon.Normal, QIcon.Off)
         self.actionUpdate_Plugins.setIcon(icon6)
         self.actionUpdate_Plugins.setObjectName(_fromUtf8("actionUpdate_Plugins"))
         self.actionOpen_File = QAction(MainWindow)
         icon7 = QIcon()
-        icon7.addPixmap(QPixmap(_fromUtf8("../resources/PNG_Files/File_Formats/format.PNG")), QIcon.Normal, QIcon.Off)
+        icon7.addPixmap(QPixmap(_fromUtf8(os.path.join("..","resources","PNG_Files","File_Formats","format.PNG"))), QIcon.Normal, QIcon.Off)
         self.actionOpen_File.setIcon(icon7)
         self.actionOpen_File.setObjectName(_fromUtf8("actionOpen_File"))
         self.toolbar.addAction(self.actionCheckout)
@@ -123,10 +124,22 @@ class Ui_MainWindow(object):
         self.toolbar.addAction(self.actionUpdate_Plugins)
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.actionSettings)
-
+        
         self.retranslateUi(MainWindow)
         self.fileTabs.setCurrentIndex(0)
         QMetaObject.connectSlotsByName(MainWindow)
+        
+        # Popup Menus
+        self.localPopMenu = QMenu(MainWindow)
+        self.localPopMenu.addAction(self.actionCheckin)
+        self.localPopMenu.addSeparator()
+        self.localPopMenu.addAction(self.actionOpen_File)
+        
+        self.projectPopMenu = QMenu(MainWindow)
+        self.projectPopMenu.addAction(self.actionCheckout)
+        self.projectPopMenu.addAction(self.actionInstall)
+        self.projectPopMenu.addSeparator()
+        self.projectPopMenu.addAction(self.actionOpen_File)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QApplication.translate("MainWindow", "Chasm Project Utility", None, QApplication.UnicodeUTF8))
@@ -200,11 +213,28 @@ class Ui_MainWindow(object):
         
         # File Selection Widgets
         QObject.connect(self.localFilesTreeWidget, SIGNAL("itemSelectionChanged()"), controller.localItemSelectionChanged)
-        QObject.connect(self.localFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), controller.localFilesContextMenu)
+        #QObject.connect(self.localFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), controller.localFilesContextMenu)
+        QObject.connect(self.localFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), self.localFilesContextMenu)
         QObject.connect(self.projectFilesTreeWidget, SIGNAL("itemSelectionChanged()"), controller.projectItemSelectionChanged)
-        QObject.connect(self.projectFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), controller.projectFilesContextMenu)
-        
+        #QObject.connect(self.projectFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), controller.projectFilesContextMenu)
+        QObject.connect(self.projectFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), self.projectFilesContextMenu)
+
+    def localFilesContextMenu(self, point):
+        curItem = self.localFilesTreeWidget.currentItem()
+        if not type(curItem) == types.NoneType:
+            if curItem.text(5):
+                self.localPopMenu.exec_(self.localFilesTreeWidget.mapToGlobal(point))
     
+    def projectFilesContextMenu(self, point):
+        curItem = self.projectFilesTreeWidget.currentItem()
+        if not type(curItem) == types.NoneType:
+            if curItem.text(5):
+                self.projectPopMenu.exec_(self.projectFilesTreeWidget.mapToGlobal(point))
+
+#import sys
+#app = QApplication(sys.argv)
+#MainWindow = QMainWindow()
+#ui = Ui_MainWindow()
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
@@ -221,4 +251,6 @@ if __name__ == "__main__":
     
     MainWindow.show()
     sys.exit(app.exec_())
-
+    
+#def displayLocalFilesContexMenu(point):
+#    ui.localPopMenu.exec_(ui.localFilesTreeWidget.mapToGlobal(point))
