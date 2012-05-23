@@ -6,8 +6,9 @@
 """
 
 import os, sys, traceback
-from project.project import Project
-from project.visitors.infoVisitor import InfoVisitor
+from project import Project
+from utilities import *
+#from project.visitors.infoVisitor import InfoVisitor
 
 def run():
 	"""
@@ -19,12 +20,10 @@ def run():
 		print ("Creating New Project...")
 		proj = Project()
 		print ("Configuring Project...")
-		#proj.config()
 		if len(sys.argv) == 2 and os.path.exists(str(sys.argv[1])):
-			proj.config(str(sys.argv[1]))
+			configureProject(str(sys.argv[1]))
 		else:
-			proj.config('.config.ini')
-	
+			configureProject('.config.ini')
 	except Exception as e:
 		print "Error:", e
 		print "Stacktrace:"
@@ -42,7 +41,7 @@ def run():
 		elif raw == 'checkout':
 			print("Specify the path, starting from the root directory:")
 			temp = raw_input()
-			coPath = os.path.join(proj.getProjectDir(), temp)
+			coPath = os.path.join(getProjectDir(), temp)
 			if os.path.exists(coPath):
 				print("Do you want to lock this folder? (y/n):")
 				resp = raw_input()
@@ -51,9 +50,9 @@ def run():
 				#	if exc.errno == errno.EEXIST:
 				try:
 					if resp == "y":
-						proj.checkout(coPath, True)
+						checkout(coPath, True)
 					elif resp == "n":
-						proj.checkout(coPath, False)
+						checkout(coPath, False)
 				except Exception as e:
 					print "Error:", e
 			else:
@@ -63,11 +62,11 @@ def run():
 		elif raw == 'checkin':
 			print("Specify the folder you wish to checkin:")
 			temp = raw_input()
-			toCheckin = os.path.join(proj.getLocalDir(), temp)
+			toCheckin = os.path.join(getUserDir(), temp)
 			if os.path.exists(toCheckin):
 				#TODO catch exception and add override functionality
-				if(proj.canCheckin(toCheckin)):
-					proj.checkin(toCheckin)
+				if(canCheckin(toCheckin)):
+					checkin(toCheckin)
 				else:
 					print("Can not checkin: file is locked or newer verion is available")
 			else:
@@ -76,20 +75,15 @@ def run():
 		elif raw == 'new':
 			print ("Specify the path, starting from the root directory:")
 			temp = raw_input()
-			if os.path.exists(os.path.join(proj.getProjectDir(), temp)):
+			if os.path.exists(os.path.join(getProjectDir(), temp)):
 				print ("What do you want to name the folder?")
 				temp2 = raw_input()
-				print ("What type of folder do you want to create?")
-				print ("1 - Sub Folder")
-				print ("2 - Asset Folder")
-				print ("3 - Shot Folder")
-				print ("4 - Animation Folder")
-				print ("5 - CharFX Folder")
-				print ("6 - FX Folder")
-				print ("7 - Lighting Folder")
-				print ("8 - Compositing Folder")
+				print ("Is this a versioned folder?")
 				temp3 = raw_input()
-				proj.mkDir(temp, temp2, temp3)
+				if temp3 == "y":
+					addVersionedFolder(os.path.join(getProjectDir(),temp), temp2)
+				else:
+					addProjectFolder(os.path.join(getProjectDir(),temp), temp2)
 			else:
 				print ("The specified path does not exist.")
 		
@@ -105,7 +99,7 @@ def run():
 			os.system("clear")
 			
 		else:
-			print("Unrecognized Input.  Please try again")
+			print("e, checkout, checkin, new, stats, clear")
 
 if __name__ == "__main__":
 	# Someone is launching this directly
