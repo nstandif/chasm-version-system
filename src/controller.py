@@ -10,6 +10,15 @@ def runCheckin():
 def runInstall():
     print "Install"
 
+def runNew():
+    print "New"
+
+def runRename():
+    print "Rename"
+
+def runRemove():
+    print "Remove"
+
 def runOpen():
     print "Open"
 
