@@ -87,6 +87,24 @@ def run():
 			else:
 				print ("The specified path does not exist.")
 		
+		elif raw == 'install':
+			print ("Specify the path to the versioned folder, starting from the root directory:")
+			temp = raw_input()
+			vDirPath = os.path.join(getProjectDir(), temp)
+			if os.path.exists(vDirPath):
+				files = getAvailableInstallFiles(vDirPath)
+				print ("Which file do you want to install?")
+				for f in files:
+					print f
+				srcFilePath = raw_input()
+				print ("Is this file stable? y/n:")
+				resp = raw_input()
+				if resp == "y":
+					setStable = True
+				else:
+					setStable = False
+				install(vDirPath, srcFilePath, setStable)
+		
 		elif raw == 'stats':
 			try:
 				proj.load()

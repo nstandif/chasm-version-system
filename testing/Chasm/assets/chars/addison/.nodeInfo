@@ -2,7 +2,7 @@
 type = asset
 
 [Versioning]
-latestversion = 1
+latestversion = 0
 locked = False
 lastcheckouttime = Wed, 23 May 2012 02:15:39 PM
 lastcheckoutuser = Morgan Strong

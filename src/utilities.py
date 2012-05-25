@@ -1,9 +1,11 @@
 """
 This module contains functionality to manage the animation project.
+@author: Morgan Strong, Brian Kingery
 """
 
-import os, time, shutil, project
+import os, time, shutil, glob, project
 from ConfigParser import ConfigParser
+from subprocess import call
 
 # The project object is just a container to store persistent
 # project information.
@@ -16,6 +18,11 @@ def getUsername():
 	return project._username
 def getUserDir():
 	return project._local_dir
+
+def getHoudiniPython():
+	"""precondition: HFS environment variable is set correctly"""
+	return os.path.join(os.environ['HFS'], "python/bin/python")
+
 def getNullReference():
 	"""@returns: The path to the .nullReference file used for symlinks"""
 	if not os.path.exists(os.path.join(getProjectDir(), '.nullReference')):
@@ -99,7 +106,8 @@ def addVersionedFolder(parent, name):
 	new_dir = os.path.join(parent, name)
 	os.makedirs(os.path.join(new_dir, "src", "v0"))
 	os.makedirs(os.path.join(new_dir, "inst"))
-	os.symlink(os.path.join(new_dir, 'inst', getNullReference()), os.path.join(new_dir, 'inst','stable'))
+	#os.symlink(os.path.join(new_dir, 'inst', getNullReference()), os.path.join(new_dir, 'inst','stable'))
+	os.symlink(getNullReference(), os.path.join(new_dir, 'inst','stable'))
 	createNodeInfoFile(new_dir)
 def addProjectFolder(parent, name):
 	os.makedirs(os.path.join(parent, name))
@@ -223,5 +231,59 @@ def checkin(toCheckin):
 	os.remove(os.path.join(newVersionPath, ".checkoutInfo"))
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Install
-def install(path):
-	pass
+def getAvailableInstallFiles(vDirPath):
+	"""
+	@returns: a list of all file paths in this directory
+	"""
+	if not os.path.exists(os.path.join(vDirPath, ".nodeInfo")):
+		raise Exception("Not a versioned folder.")
+	
+	nodeInfo = ConfigParser()
+	nodeInfo.read(os.path.join(vDirPath, ".nodeInfo"))
+	version = nodeInfo.get("Versioning", "latestversion")
+	latest = os.path.join(vDirPath, "src", "v"+version)
+	
+	files = glob.glob(os.path.join(latest,'*'))
+	#files = os.listdir(latest)
+	return files
+
+def _isHoudiniFile(filename):
+	"""
+	@returns: True if filename has the extension '.hip' or '.hipnc' or '.picnc
+	"""
+	houdiniExts = ['.hip', '.hipnc', '.picnc']
+	name, ext = os.path.splitext(filename)
+	return ext in houdiniExts
+	
+def _isMayaFile(filename):
+	"""
+	@returns: True if filename has the extension '.ma' or '.mb'
+	"""
+	mayaExts = ['.ma', '.mb']
+	name, ext = os.path.splitext(filename)
+	return ext in mayaExts
+	
+def install(vDirPath, srcFilePath, setStable):
+	"""
+	Installs a file for production use and flattens maya/houdini dependencies.
+	Use getAvailableInstallFiles(dirPath) to get a list of files.
+	@precondition: vDirPath and srcFilePath are valid paths
+	@postcondition: if setStable == True then stable symlink will point to filename
+	"""
+	instDir = os.path.join(vDirPath, "inst")
+	numFiles = len(glob.glob(os.path.join(instDir, '*')))
+	instName, instExt = os.path.splitext(os.path.basename(srcFilePath))
+	newInstFilePath = os.path.join(instDir, instName + '_' + str(numFiles) + instExt)
+	
+	if _isHoudiniFile(newInstFilePath):
+		call([getHoudiniPython(), "installHoudiniFile.py", srcFilePath, newInstFilePath])
+	elif _isMayaFile(newInstFilePath):
+		#TODO integrate maya install
+		print "Maya Install not yet implemented"
+	else:
+		#Just copy the file
+		shutil.copy(srcFilePath, newInstFilePath)
+	
+	if setStable:
+		os.unlink(os.path.join(instDir, 'stable'))
+		os.symlink(newInstFilePath, os.path.join(instDir, 'stable'))
