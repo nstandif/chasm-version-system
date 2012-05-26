@@ -21,7 +21,11 @@ def getUserDir():
 
 def getHoudiniPython():
 	"""precondition: HFS environment variable is set correctly"""
-	return os.path.join(os.environ['HFS'], "python/bin/python")
+	return os.path.join(os.environ['HFS'], "python", "bin", "python")
+
+def getMayapy():
+	"""precondition: MAYA_LOCATION environment variable is set correctly"""
+	return os.path.join(os.environ['MAYA_LOCATION'], "bin", "mayapy")
 
 def getNullReference():
 	"""@returns: The path to the .nullReference file used for symlinks"""
@@ -196,6 +200,7 @@ def canCheckin(toCheckin):
 			result = False
 	
 	return result
+
 def checkin(toCheckin):
 	"""
 	Checks a folder back in as the newest version
@@ -278,12 +283,12 @@ def install(vDirPath, srcFilePath, setStable):
 	if _isHoudiniFile(newInstFilePath):
 		call([getHoudiniPython(), "installHoudiniFile.py", srcFilePath, newInstFilePath])
 	elif _isMayaFile(newInstFilePath):
-		#TODO integrate maya install
-		print "Maya Install not yet implemented"
+		call([getMayapy(), "installMayaFile.py", srcFilePath, newInstFilePath])
 	else:
 		#Just copy the file
 		shutil.copy(srcFilePath, newInstFilePath)
 	
 	if setStable:
+		#TODO os.symlink() doesn't work in windows
 		os.unlink(os.path.join(instDir, 'stable'))
 		os.symlink(newInstFilePath, os.path.join(instDir, 'stable'))
