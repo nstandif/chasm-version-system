@@ -1,16 +1,9 @@
 
-import sys, os, os.path
-import ConfigParser
-import time
-import shutil, errno
-
-##TODO: Perhaps refactor the path stuff into a "PathFactory" of sorts.  This could also handle path validation
-
 class _Project:
 	"""
 	Singleton: Use project.Project() to instantiate this class
-	This class represents the entirety of an animation project. It contains a
-	list of folder nodes, project properties, etc.
+	This class stores an in memory model of information needed
+	for the revisioning tool.
 	
 	@author: Morgan Strong, Brian Kingery
 	"""
