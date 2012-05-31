@@ -17,9 +17,6 @@ try:
 except AttributeError:
 	_fromUtf8 = lambda s: s
 
-def test():
-	print "This was run."
-
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
 		MainWindow.setObjectName(_fromUtf8("MainWindow"))
@@ -165,6 +162,28 @@ class Ui_MainWindow(object):
 		self.projectPopMenu.addAction(self.actionNew)
 		self.projectPopMenu.addAction(self.actionRename)
 		self.projectPopMenu.addAction(self.actionRemove)
+		
+		# Dialog Menus
+		## File Dialog
+		self.file_select_dialog = QDialog()
+		self.file_select_dialog.setObjectName(_fromUtf8("file_select_dialog"))
+		self.file_select_dialog.resize(330, 475)
+		self.hl = QHBoxLayout(self.file_select_dialog)
+		self.hl.setObjectName(_fromUtf8("horizontalLayout"))
+		self.tw = QTreeWidget(self.file_select_dialog)
+		self.tw.setObjectName(_fromUtf8("treeWidget"))
+		self.hl.addWidget(self.tw)
+		self.bb = QDialogButtonBox(self.file_select_dialog)
+		self.bb.setOrientation(Qt.Vertical)
+		self.bb.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+		self.bb.setObjectName(_fromUtf8("buttonBox"))
+		self.hl.addWidget(self.bb)
+		self.file_select_dialog.setModal(True)
+		self.file_select_dialog.setWindowTitle(QApplication.translate("Select a File", "", None, QApplication.UnicodeUTF8))
+		self.tw.headerItem().setText(0, QApplication.translate("FileSelectDialog", "File", None, QApplication.UnicodeUTF8))
+		QObject.connect(self.bb, SIGNAL(_fromUtf8("accepted()")), self.file_select_dialog.accept)
+		QObject.connect(self.bb, SIGNAL(_fromUtf8("rejected()")), self.file_select_dialog.reject)
+		QMetaObject.connectSlotsByName(self.file_select_dialog)
 	def retranslateUi(self, MainWindow):
 		#Set Titles
 		MainWindow.setWindowTitle(QApplication.translate("MainWindow", "Chasm Project Utility", None, QApplication.UnicodeUTF8))
@@ -217,7 +236,7 @@ class Ui_MainWindow(object):
 		QObject.connect(self.actionCheckout, SIGNAL("triggered()"), controller.runCheckout)
 		QObject.connect(self.actionCheckin, SIGNAL("triggered()"), controller.runCheckin)
 		QObject.connect(self.actionInstall, SIGNAL("triggered()"), controller.runInstall)
-		QObject.connect(self.actionOpen_File, SIGNAL("triggered()"), controller.runOpen)
+		QObject.connect(self.actionOpen_File, SIGNAL("triggered()"), self.showFileDialog)
 		QObject.connect(self.actionSettings, SIGNAL("triggered()"), controller.runSettings)
 		QObject.connect(self.actionUpdate_Plugins, SIGNAL("triggered()"), controller.runUpdatePlugins)
 		QObject.connect(self.actionNew, SIGNAL("triggered()"), controller.runNew)
@@ -237,7 +256,6 @@ class Ui_MainWindow(object):
 	
 	def populateLocalTree(self, MainWindow):
 		pass
-	
 	def populateProjectTree(self, MainWindow):
 		root = QTreeWidgetItem(ui.projectFilesTreeWidget)
 		root.setText(0, "Chasm")
@@ -267,6 +285,9 @@ class Ui_MainWindow(object):
 				self.actionCheckout.setEnabled(False)
 				self.actionInstall.setEnabled(False)
 				self.projectPopMenu.popup(self.projectFilesTreeWidget.mapToGlobal(point))
+	def showFileDialog(self):
+		curItem = self.localFilesTreeWidget.currentItem()
+		self.file_select_dialog.show()
 
 #import sys
 #app = QApplication(sys.argv)

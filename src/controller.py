@@ -20,7 +20,7 @@ def runRemove():
     print "Remove"
 
 def runOpen():
-    print "Open"
+    guiDriver.showFileDialog("/")
 
 def runUpdatePlugins():
     print "Update Plugins"
@@ -42,3 +42,8 @@ def projectItemSelectionChanged():
 
 def projectFilesContextMenu(point1):
     print "Project Item Context Menu", str(point1)
+
+def fileDialogAccept():
+    print "Accepted"
+def fileDialogRejected():
+    print "Rejected"

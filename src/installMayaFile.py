@@ -11,7 +11,7 @@ import maya.standalone
 
 maya.standalone.initialize(name='python')
 
-def importObjectsFromRefrence(srcFilePath, newInstFilePath):
+def importObjectsFromReference(srcFilePath, newInstFilePath):
     """
     Imports all references in srcFilePath and saves the result to newInstFilePath
     """
@@ -33,6 +33,6 @@ def importObjectsFromRefrence(srcFilePath, newInstFilePath):
 
 # >>>>>>>>>>>>>>>>>>>>>>>> STARTS HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<
 if len(sys.argv) == 3 and os.path.exists(str(sys.argv[1])) and not os.path.exists(str(sys.argv[2])):
-    importObjectsFromRefrence(str(sys.argv[1]), str(sys.argv[2]))
+    importObjectsFromReference(str(sys.argv[1]), str(sys.argv[2]))
 else:
     raise Exception("Can not install file: File does not exist.")
