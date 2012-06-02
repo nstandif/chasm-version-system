@@ -270,9 +270,13 @@ class Ui_MainWindow(object):
         #QObject.connect(self.projectFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), controller.projectFilesContextMenu)
         QObject.connect(self.projectFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), self.projectFilesContextMenu)
     
-    def populateLocalTree(self, MainWindow):
-        addisonItem = QTreeWidgetItem(ui.localFilesTreeWidget)
-        addisonItem.setText(0, "addison")
+    def populateLocalTree(self):
+        self.localFilesTreeWidget.clear()
+        files = os.listdir(controller.getUserDir())
+        items = self.convertToQTreeWidgetItems(files)
+        self.localFilesTreeWidget.addTopLevelItems(items)
+        #addisonItem = QTreeWidgetItem(ui.localFilesTreeWidget)
+        #addisonItem.setText(0, "addison")
     
     def populateProjectTree(self, MainWindow):
         #root = QTreeWidgetItem(ui.projectFilesTreeWidget)
@@ -331,9 +335,6 @@ class Ui_MainWindow(object):
         else:
             return None
     
-    def getSelectedFileItem(self):
-        return self.tw.currentItem()
-    
     def getTreeItemPath(self, treeItem, path):
         if not type(treeItem.parent()) == types.NoneType:
             path = self.getTreeItemPath(treeItem.parent(), path)
@@ -363,7 +364,7 @@ if __name__ == "__main__":
     #Create in Memory model Project - looking for .config.ini
     controller.setup(ui)
     
-    ui.populateLocalTree(MainWindow)
+    ui.populateLocalTree()
     ui.populateProjectTree(MainWindow)
     
     MainWindow.show()

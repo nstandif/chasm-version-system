@@ -37,6 +37,7 @@ def runCheckout(ui):
         try:
             #TODO ask about locking?
             checkout(coPath, True)
+            ui.populateLocalTree()
         except Exception as e:
             ui.errorMessage.showMessage(str(e))
     else:
@@ -49,6 +50,7 @@ def runCheckin(ui):
         toCheckin = os.path.join(getUserDir(), ui.getTreeItemPath(curItem, ""))
         if canCheckin(toCheckin):
             checkin(toCheckin)
+            ui.populateLocalTree()
         else:
             ui.errorMessage.showMessage("Can not checkin: file is locked or newer verion is available")
     else:
