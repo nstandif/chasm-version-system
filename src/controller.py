@@ -1,6 +1,6 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-import os
+import os, glob
 from project import Project
 import utilities
 from utilities import *
@@ -8,13 +8,14 @@ from utilities import *
 _tabNum = 0
 
 def setup(ui):
+    #TODO change to .config.ini to match utilities
     if not os.path.exists(".myConfig.ini"):
         parms = []
         parms.append("Chasm")
         ui.messageBox.setText("Please choose the root project directory")
         ui.messageBox.exec_()
         parms.append(ui.setupDirsDialog.getExistingDirectory(ui._MainWindow, "Choose Project Dir", os.environ['HOME']))
-        #parms.append(os.environ['USERNAME'])
+        #TODO ask for user name?
         parms.append(os.getlogin())
         ui.messageBox.setText("Please choose your local directory")
         ui.messageBox.exec_()
@@ -23,6 +24,8 @@ def setup(ui):
         utilities._configureProject(parms, '.myConfig.ini')
     else:
         configureProject('.myConfig.ini')
+    populateLocalTree(ui)
+    populateProjectTree(ui)
     
 def runAlembic():
     print "Alembic"
@@ -37,7 +40,7 @@ def runCheckout(ui):
         try:
             #TODO ask about locking?
             checkout(coPath, True)
-            ui.populateLocalTree()
+            populateLocalTree(ui)
         except Exception as e:
             ui.errorMessage.showMessage(str(e))
     else:
@@ -50,7 +53,8 @@ def runCheckin(ui):
         toCheckin = os.path.join(getUserDir(), ui.getTreeItemPath(curItem, ""))
         if canCheckin(toCheckin):
             checkin(toCheckin)
-            ui.populateLocalTree()
+            populateLocalTree(ui)
+            populateProjectTree(ui)
         else:
             ui.errorMessage.showMessage("Can not checkin: file is locked or newer verion is available")
     else:
@@ -66,6 +70,7 @@ def runInstall(ui):
         #TODO ask about stable
         try:
             install(vDirPath, srcFilePath, True)
+            populateProjectTree(ui)
         except Exception as e:
             ui.errorMessage.showMessage(str(e))
     else:
@@ -108,3 +113,42 @@ def fileDialogAccept():
     print "Accepted"
 def fileDialogRejected():
     print "Rejected"
+
+def populateProjectTree(ui):
+    ui.projectFilesTreeWidget.clear()
+    recurseProjectFiles(ui, ui.projectFilesTreeWidget, getProjectDir())
+
+def recurseProjectFiles(ui, parent, curDir):
+    if isVersionedFolder(curDir):
+        info = getVersionedFolderInfo(curDir)
+        parent.setText(1, info[0])
+        parent.setText(2, info[1])
+        parent.setText(3, info[2])
+        parent.setText(4, info[3])
+        parent.setText(5, info[4])
+        return
+    
+    if os.path.isdir(curDir):
+        files = glob.glob(os.path.join(curDir, '*'))
+        for f in files:
+            item = QTreeWidgetItem(parent)
+            item.setText(0, os.path.basename(f))
+            recurseProjectFiles(ui, item, f)
+        
+
+def populateLocalTree(ui):
+    ui.localFilesTreeWidget.clear()
+    files = glob.glob(os.path.join(getUserDir(),'*'))
+    items = convertToLocalTreeWidgetItems(files)
+    ui.localFilesTreeWidget.addTopLevelItems(items)
+
+def convertToLocalTreeWidgetItems(files):
+    treeItems = []
+    for f in files:
+        item = QTreeWidgetItem()
+        item.setText(0, os.path.basename(f))
+        item.setText(1, getFilesCheckoutTime(f))
+        item.setText(2, f) #TODO last opened stuff
+        item.setText(3, f)
+        treeItems.append(item)
+    return treeItems

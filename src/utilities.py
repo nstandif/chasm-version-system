@@ -120,6 +120,33 @@ def removeFolder(name):
 def renameFolder(oldName, newName):
 	pass
 
+def isVersionedFolder(dirPath):
+	if os.path.exists(os.path.join(dirPath, ".nodeInfo")):
+		return True
+	else:
+		return False
+
+def getVersionedFolderInfo(dirPath):
+	if not isVersionedFolder(dirPath):
+		raise Exception("Not a versioned folder")
+	
+	nodeInfo = []
+	cp = ConfigParser()
+	cp.read(os.path.join(dirPath, ".nodeInfo"))
+	print "NODEINFO:: "+ os.path.join(dirPath, ".nodeInfo")
+	nodeInfo.append(cp.get("Versioning", "locked"))
+	nodeInfo.append(cp.get("Versioning", "lastcheckinuser"))
+	nodeInfo.append(cp.get("Versioning", "lastcheckintime"))
+	stable = os.path.join(dirPath, "inst", "stable")
+	print "STABLE:: " + stable
+	if os.path.exists(os.readlink(stable)) and not os.readlink(stable) == ".nullReference":
+		nodeInfo.append("Yes")
+		nodeInfo.append(stable)
+	else:
+		nodeInfo.append("No")
+		nodeInfo.append("")
+	return nodeInfo
+
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Checkout
 def _createCheckoutInfoFile(dirPath, coPath, version, timestamp, lock):
 	"""
@@ -135,6 +162,15 @@ def _createCheckoutInfoFile(dirPath, coPath, version, timestamp, lock):
 	chkoutInfo.set("Checkout", "lockedbyme", str(lock))
 	
 	_writeConfigFile(os.path.join(dirPath, ".checkoutInfo"), chkoutInfo)
+
+def getFilesCheckoutTime(filePath):
+	checkoutInfo = os.path.join(filePath, ".checkoutInfo")
+	print checkoutInfo
+	if not os.path.exists(checkoutInfo):
+		raise Exception("No checkout info available")
+	cp = ConfigParser()
+	cp.read(checkoutInfo)
+	return cp.get("Checkout", "checkouttime")
 
 def canCheckout(coPath):
 	result = True
@@ -156,7 +192,8 @@ def checkout(coPath, lock):
 		with the name of the versioned folder
 	@postdondition: If lock == True coPath will be locked until it is released by checkin
 	"""
-	if not os.path.exists(os.path.join(coPath, ".nodeInfo")):
+	#if not os.path.exists(os.path.join(coPath, ".nodeInfo")):
+	if not isVersionedFolder(coPath):
 		raise Exception("Not a versioned folder.")
 	
 	nodeInfo = ConfigParser()
@@ -251,7 +288,8 @@ def getAvailableInstallFiles(vDirPath):
 	"""
 	@returns: a list of all file paths in this directory
 	"""
-	if not os.path.exists(os.path.join(vDirPath, ".nodeInfo")):
+	#if not os.path.exists(os.path.join(vDirPath, ".nodeInfo")):
+	if not isVersionedFolder(vDirPath):
 		raise Exception("Not a versioned folder.")
 	
 	nodeInfo = ConfigParser()
