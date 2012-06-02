@@ -1,14 +1,73 @@
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
+import os
+from project import Project
+import utilities
+from utilities import *
+
+_tabNum = 0
+
+def setup(ui):
+    if not os.path.exists(".myConfig.ini"):
+        parms = []
+        parms.append("Chasm")
+        ui.messageBox.setText("Please choose the root project directory")
+        ui.messageBox.exec_()
+        parms.append(ui.setupDirsDialog.getExistingDirectory(ui._MainWindow, "Choose Project Dir", os.environ['HOME']))
+        #parms.append(os.environ['USERNAME'])
+        parms.append(os.getlogin())
+        ui.messageBox.setText("Please choose your local directory")
+        ui.messageBox.exec_()
+        parms.append(ui.setupDirsDialog.getExistingDirectory(ui._MainWindow, "Choose Local Directory", os.environ['HOME']))
+        
+        utilities._configureProject(parms, '.myConfig.ini')
+    else:
+        configureProject('.myConfig.ini')
+    
 def runAlembic():
     print "Alembic"
 
-def runCheckout():
-    print "Checkout"
+def runCheckout(ui):
+    tabNum = ui.fileTabs.currentIndex()
+    if tabNum == 1:
+        curItem = ui.projectFilesTreeWidget.currentItem()
+        print curItem.text(0)
+        coPath = os.path.join(getProjectDir(), ui.getTreeItemPath(curItem, ""))
+        print coPath
+        try:
+            #TODO ask about locking?
+            checkout(coPath, True)
+        except Exception as e:
+            ui.errorMessage.showMessage(str(e))
+    else:
+        ui.errorMessage.showMessage("You can only checkout project files")
 
-def runCheckin():
-    print "Checkin"
+def runCheckin(ui):
+    tabNum = ui.fileTabs.currentIndex()
+    if tabNum == 0:
+        curItem = ui.localFilesTreeWidget.currentItem()
+        toCheckin = os.path.join(getUserDir(), ui.getTreeItemPath(curItem, ""))
+        if canCheckin(toCheckin):
+            checkin(toCheckin)
+        else:
+            ui.errorMessage.showMessage("Can not checkin: file is locked or newer verion is available")
+    else:
+        ui.errorMessage.showMessage("You can only checkin local files")
 
-def runInstall():
-    print "Install"
+def runInstall(ui):
+    tabNum = ui.fileTabs.currentIndex()
+    if tabNum == 1:
+        curItem = ui.projectFilesTreeWidget.currentItem()
+        vDirPath = os.path.join(getProjectDir(), ui.getTreeItemPath(curItem, ""))
+        files = getAvailableInstallFiles(vDirPath)
+        srcFilePath = str(ui.showFileDialog(ui.convertToQTreeWidgetItems(files)).text(1))
+        #TODO ask about stable
+        try:
+            install(vDirPath, srcFilePath, True)
+        except Exception as e:
+            ui.errorMessage.showMessage(str(e))
+    else:
+        ui.errorMessage.showMessage("You can only install project files")
 
 def runNew():
     print "New"

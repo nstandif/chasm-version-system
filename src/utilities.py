@@ -135,6 +135,17 @@ def _createCheckoutInfoFile(dirPath, coPath, version, timestamp, lock):
 	chkoutInfo.set("Checkout", "lockedbyme", str(lock))
 	
 	_writeConfigFile(os.path.join(dirPath, ".checkoutInfo"), chkoutInfo)
+
+def canCheckout(coPath):
+	result = True
+	if not os.path.exists(os.path.join(coPath, ".nodeInfo")):
+		result = False
+	nodeInfo = ConfigParser()
+	nodeInfo.read(os.path.join(coPath, ".nodeInfo"))
+	if nodeInfo.get("Versioning", "locked") == "True":
+		result = False
+	return result
+
 def checkout(coPath, lock):
 	"""
 	Copies the 'latest version' from the src folder into the local directory
