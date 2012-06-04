@@ -1,6 +1,6 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-import os, glob
+import os, glob, types
 from project import Project
 import utilities
 from utilities import *
@@ -26,6 +26,7 @@ def setup(ui):
         configureProject('.myConfig.ini')
     populateLocalTree(ui)
     populateProjectTree(ui)
+    enableComponents(ui)
     
 def runAlembic():
     print "Alembic"
@@ -35,7 +36,7 @@ def runCheckout(ui):
     if tabNum == 1:
         curItem = ui.projectFilesTreeWidget.currentItem()
         print curItem.text(0)
-        coPath = os.path.join(getProjectDir(), ui.getTreeItemPath(curItem, ""))
+        coPath = os.path.join(getProjectDir(), ui.getTreeItemPath(curItem, ""), )
         print coPath
         try:
             #TODO ask about locking?
@@ -94,17 +95,17 @@ def runUpdatePlugins():
 def runSettings():
     print "Settings"
 
-def tabSwitch(tabNum):
-    print "Switched tab to", str(tabNum)
+def tabSwitch(ui, tabNum):
+    enableComponents(ui)
 
-def localItemSelectionChanged():
-    print "Local Item Selection Changed"
+def localItemSelectionChanged(ui):
+    enableComponents(ui)
 
 def localFilesContextMenu(point1):
     print "Local Item Context Menu", str(point1)
 
-def projectItemSelectionChanged():
-    print "Project Item Selection Changed"
+def projectItemSelectionChanged(ui):
+    enableComponents(ui)
 
 def projectFilesContextMenu(point1):
     print "Project Item Context Menu", str(point1)
@@ -134,11 +135,10 @@ def recurseProjectFiles(ui, parent, curDir):
             item = QTreeWidgetItem(parent)
             item.setText(0, os.path.basename(f))
             recurseProjectFiles(ui, item, f)
-        
 
 def populateLocalTree(ui):
     ui.localFilesTreeWidget.clear()
-    files = glob.glob(os.path.join(getUserDir(),'*'))
+    files = glob.glob(os.path.join(str(getUserDir()),'*'))
     items = convertToLocalTreeWidgetItems(files)
     ui.localFilesTreeWidget.addTopLevelItems(items)
 
@@ -152,3 +152,40 @@ def convertToLocalTreeWidgetItems(files):
         item.setText(3, f)
         treeItems.append(item)
     return treeItems
+
+def enableComponents(ui):
+    # Project Tab Open
+    if ui.fileTabs.currentIndex():
+        ui.actionNew.setEnabled(False)
+        ui.actionRename.setEnabled(False)
+        ui.actionRemove.setEnabled(False)
+        
+        curItem = ui.projectFilesTreeWidget.currentItem()
+        ui.actionCheckin.setEnabled(False)
+        ui.actionOpen_File.setEnabled(False)
+        if not type(curItem) == types.NoneType:
+            if curItem.text(2):
+                ui.actionCheckout.setEnabled(True)
+                ui.actionInstall.setEnabled(True)
+                ui.actionCache_to_Alembic.setEnabled(True)
+            else:
+                ui.actionCheckout.setEnabled(False)
+                ui.actionInstall.setEnabled(False)
+                ui.actionCache_to_Alembic.setEnabled(False)
+    # Local Tab Open
+    else:
+        ui.actionNew.setEnabled(False)
+        ui.actionRename.setEnabled(False)
+        ui.actionRemove.setEnabled(False)
+        
+        curItem = ui.localFilesTreeWidget.currentItem()
+        ui.actionCheckout.setEnabled(False)
+        ui.actionInstall.setEnabled(False)
+        ui.actionCache_to_Alembic.setEnabled(False)
+        if not type(curItem) == types.NoneType:
+            if curItem.text(2):
+                ui.actionCheckin.setEnabled(True)
+                ui.actionOpen_File.setEnabled(True)
+            else:
+                ui.actionCheckin.setEnabled(False)
+                ui.actionOpen_File.setEnabled(False)

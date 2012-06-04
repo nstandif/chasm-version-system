@@ -137,11 +137,11 @@ class Ui_MainWindow(object):
         # Add Actions to Tool Bar
         self.toolbar.addAction(self.actionCheckout)
         self.toolbar.addAction(self.actionInstall)
+        self.toolbar.addAction(self.actionCache_to_Alembic)
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.actionCheckin)
         self.toolbar.addAction(self.actionOpen_File)
         self.toolbar.addSeparator()
-        self.toolbar.addAction(self.actionCache_to_Alembic)
         self.toolbar.addAction(self.actionUpdate_Plugins)
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.actionSettings)
@@ -260,13 +260,13 @@ class Ui_MainWindow(object):
         QObject.connect(self.actionRemove, SIGNAL("triggered()"), controller.runRemove)
         
         # Tabs
-        QObject.connect(self.fileTabs, SIGNAL("currentChanged(int)"), controller.tabSwitch)
+        QObject.connect(self.fileTabs, SIGNAL("currentChanged(int)"), self.tabSwitch)
         
         # File Selection Widgets
-        QObject.connect(self.localFilesTreeWidget, SIGNAL("itemSelectionChanged()"), controller.localItemSelectionChanged)
+        QObject.connect(self.localFilesTreeWidget, SIGNAL("itemSelectionChanged()"), self.localItemSelectionChanged)
         #QObject.connect(self.localFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), controller.localFilesContextMenu)
         QObject.connect(self.localFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), self.localFilesContextMenu)
-        QObject.connect(self.projectFilesTreeWidget, SIGNAL("itemSelectionChanged()"), controller.projectItemSelectionChanged)
+        QObject.connect(self.projectFilesTreeWidget, SIGNAL("itemSelectionChanged()"), self.projectItemSelectionChanged)
         #QObject.connect(self.projectFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), controller.projectFilesContextMenu)
         QObject.connect(self.projectFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), self.projectFilesContextMenu)
     
@@ -311,16 +311,27 @@ class Ui_MainWindow(object):
     def install(self):
         controller.runInstall(self)
     
+    def tabSwitch(self, tabNum):
+        controller.tabSwitch(self, tabNum)
+    
+    def localItemSelectionChanged(self):
+        controller.localItemSelectionChanged(self)
+    
+    def projectItemSelectionChanged(self):
+        controller.projectItemSelectionChanged(self)
+    
     def localFilesContextMenu(self, point):
         curItem = self.localFilesTreeWidget.currentItem()
         if not type(curItem) == types.NoneType:
-            if curItem.text(5):
+            if curItem.text(2):
                 self.localPopMenu.popup(self.localFilesTreeWidget.mapToGlobal(point))
     
     def projectFilesContextMenu(self, point):
         curItem = self.projectFilesTreeWidget.currentItem()
         if not type(curItem) == types.NoneType:
-            if curItem.text(5):
+            if curItem.text(2):
+                self.actionCheckout.setEnabled(True)
+                self.actionInstall.setEnabled(True)
                 self.projectPopMenu.popup(self.projectFilesTreeWidget.mapToGlobal(point))
             else:
                 self.actionCheckout.setEnabled(False)

@@ -1,19 +1,11 @@
 [Node]
-Type: animation
-
-# Type: asset, shot, animation, fx, charfx, lighting, compositing, custom
+type = animation
 
 [Versioning]
-LatestVersion: 0
-Locked: False
-LastCheckoutTime: Thu, 28 Jun 2001 2:17:15 PM
-LastCheckoutUser: Brian Kingery
-LastCheckinTime: Thu, 28 Jun 2001 4:20:00 PM
-LastCheckinUser: Nathan Standiford
+latestversion = 1
+locked = False
+lastcheckouttime = Mon, 04 Jun 2012 11:51:33 AM
+lastcheckoutuser = morgan
+lastcheckintime = Mon, 04 Jun 2012 11:56:19 AM
+lastcheckinuser = morgan
 
-# LatestVersion: 0, 1, 2, ...
-# Locked: False, True
-# ...Time: Thu, 28 Jun 2001 2:17:15 PM
-#		To Write a time: time.strftime("%a, %d %b %Y %I:%M:%S %p", gmtime())
-#		To Read a time:  time.strptime(timeString, "%a, %d %b %Y %I:%M:%S %p")
-# ...User: Morgan Strong
