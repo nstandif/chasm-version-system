@@ -17,6 +17,75 @@ try:
 except AttributeError:
     _fromUtf8 = lambda s: s
 
+class DeselectableTreeWidget(QTreeWidget):
+    def mousePressEvent(self, event):
+        self.clearSelection()
+        QTreeWidget.mousePressEvent(self, event)
+
+class FileSelectDialog(QDialog):
+    def setup(self):
+        self.setObjectName(_fromUtf8("file_select_dialog"))
+        self.resize(330, 475)
+        self.hl = QHBoxLayout(self)
+        self.hl.setObjectName(_fromUtf8("horizontalLayout"))
+        self.tw = QTreeWidget(self)
+        self.tw.setObjectName(_fromUtf8("treeWidget"))
+        self.hl.addWidget(self.tw)
+        self.bb = QDialogButtonBox(self)
+        self.bb.setOrientation(Qt.Vertical)
+        self.bb.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.bb.setObjectName(_fromUtf8("buttonBox"))
+        self.hl.addWidget(self.bb)
+        self.setModal(True)
+        self.setWindowTitle(QApplication.translate("Select a File", "", None, QApplication.UnicodeUTF8))
+        self.tw.headerItem().setText(0, QApplication.translate("FileSelectDialog", "File", None, QApplication.UnicodeUTF8))
+        QObject.connect(self.bb, SIGNAL(_fromUtf8("accepted()")), self.accept)
+        QObject.connect(self.bb, SIGNAL(_fromUtf8("rejected()")), self.reject)
+        QMetaObject.connectSlotsByName(self)
+    
+    def selectFile(self, filesToDisplay):
+        self.tw.clear()
+        self.tw.addTopLevelItems(filesToDisplay)
+        if self.exec_() == 1:
+            return self.tw.currentItem()
+        else:
+            return None
+
+class NewFolderDialog(QDialog):
+    def setup(self):
+        self.setObjectName(_fromUtf8("newFolderDialog"))
+        #self.resize(330, 475)
+        self.hl = QHBoxLayout(self)
+        self.hl.setObjectName(_fromUtf8("horizontalLayout"))
+        self.cb = QComboBox(self)
+        self.cb.setObjectName(_fromUtf8("comboBox"))
+        self.cb.addItems(QStringList(["Project Folder", "Versioned Folder"]))
+        self.hl.addWidget(self.cb)
+        self.le = QLineEdit(self)
+        self.le.setObjectName(_fromUtf8("lineEdit"))
+        self.hl.addWidget(self.le)
+        self.bb = QDialogButtonBox(self)
+        self.bb.setOrientation(Qt.Vertical)
+        self.bb.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.bb.setObjectName(_fromUtf8("buttonBox"))
+        self.hl.addWidget(self.bb)
+        self.setModal(True)
+        self.setWindowTitle(QApplication.translate("New Folder", "", None, QApplication.UnicodeUTF8))
+        QObject.connect(self.bb, SIGNAL(_fromUtf8("accepted()")), self.accept)
+        QObject.connect(self.bb, SIGNAL(_fromUtf8("rejected()")), self.reject)
+        QMetaObject.connectSlotsByName(self)
+    
+    def getNewFolder(self):
+        self.cb.setCurrentIndex(0)
+        self.le.setText("NewFolder")
+        self.le.selectAll()
+        if self.exec_() == 1:
+            folderType = self.cb.currentIndex()
+            folderName = str(self.le.text())
+            return [folderType, folderName]
+        else:
+            return [None, None]
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         self._MainWindow = MainWindow
@@ -46,12 +115,14 @@ class Ui_MainWindow(object):
         self.localFilesTreeWidget.setIndentation(12)
         self.verticalLayout_2.addWidget(self.localFilesTreeWidget)
         self.fileTabs.addTab(self.localFilesTab, _fromUtf8(""))
+        
         self.projectFilesTab = QWidget()
         self.projectFilesTab.setObjectName(_fromUtf8("projectFilesTab"))
         self.verticalLayout = QVBoxLayout(self.projectFilesTab)
         self.verticalLayout.setMargin(5)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.projectFilesTreeWidget = QTreeWidget(self.projectFilesTab)
+        #self.projectFilesTreeWidget = QTreeWidget(self.projectFilesTab)
+        self.projectFilesTreeWidget = DeselectableTreeWidget(self.projectFilesTab)
         self.projectFilesTreeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.projectFilesTreeWidget.setObjectName(_fromUtf8("projectFilesTreeWidget"))
         self.projectFilesTreeWidget.header().setDefaultSectionSize(120)
@@ -167,25 +238,8 @@ class Ui_MainWindow(object):
         
         # Dialog Menus
         ## File Dialog
-        self.file_select_dialog = QDialog()
-        self.file_select_dialog.setObjectName(_fromUtf8("file_select_dialog"))
-        self.file_select_dialog.resize(330, 475)
-        self.hl = QHBoxLayout(self.file_select_dialog)
-        self.hl.setObjectName(_fromUtf8("horizontalLayout"))
-        self.tw = QTreeWidget(self.file_select_dialog)
-        self.tw.setObjectName(_fromUtf8("treeWidget"))
-        self.hl.addWidget(self.tw)
-        self.bb = QDialogButtonBox(self.file_select_dialog)
-        self.bb.setOrientation(Qt.Vertical)
-        self.bb.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-        self.bb.setObjectName(_fromUtf8("buttonBox"))
-        self.hl.addWidget(self.bb)
-        self.file_select_dialog.setModal(True)
-        self.file_select_dialog.setWindowTitle(QApplication.translate("Select a File", "", None, QApplication.UnicodeUTF8))
-        self.tw.headerItem().setText(0, QApplication.translate("FileSelectDialog", "File", None, QApplication.UnicodeUTF8))
-        QObject.connect(self.bb, SIGNAL(_fromUtf8("accepted()")), self.file_select_dialog.accept)
-        QObject.connect(self.bb, SIGNAL(_fromUtf8("rejected()")), self.file_select_dialog.reject)
-        QMetaObject.connectSlotsByName(self.file_select_dialog)
+        self.file_select_dialog = FileSelectDialog(MainWindow)
+        self.file_select_dialog.setup()
         
         ## Error Message
         self.errorMessage = QErrorMessage(MainWindow)
@@ -195,6 +249,10 @@ class Ui_MainWindow(object):
         
         ## Setup Directory Dialog
         self.setupDirsDialog = QFileDialog(MainWindow)
+        
+        ## New Folder Dialog
+        self.newFolderDialog = NewFolderDialog(MainWindow)
+        self.newFolderDialog.setup()
     
     def retranslateUi(self, MainWindow):
         #Set Titles
@@ -246,16 +304,13 @@ class Ui_MainWindow(object):
     def connectSignalsAndSlots(self, MainWindow):
         # Action calls
         QObject.connect(self.actionCache_to_Alembic, SIGNAL("triggered()"), controller.runAlembic)
-        #QObject.connect(self.actionCheckout, SIGNAL("triggered()"), controller.runCheckout)
         QObject.connect(self.actionCheckout, SIGNAL("triggered()"), self.checkout)
-        #QObject.connect(self.actionCheckin, SIGNAL("triggered()"), controller.runCheckin)
         QObject.connect(self.actionCheckin, SIGNAL("triggered()"), self.checkin)
-        #QObject.connect(self.actionInstall, SIGNAL("triggered()"), controller.runInstall)
         QObject.connect(self.actionInstall, SIGNAL("triggered()"), self.install)
-        QObject.connect(self.actionOpen_File, SIGNAL("triggered()"), self.showFileDialog)
+        QObject.connect(self.actionOpen_File, SIGNAL("triggered()"), self.openFile)
         QObject.connect(self.actionSettings, SIGNAL("triggered()"), controller.runSettings)
         QObject.connect(self.actionUpdate_Plugins, SIGNAL("triggered()"), controller.runUpdatePlugins)
-        QObject.connect(self.actionNew, SIGNAL("triggered()"), controller.runNew)
+        QObject.connect(self.actionNew, SIGNAL("triggered()"), self.newFolder)
         QObject.connect(self.actionRename, SIGNAL("triggered()"), controller.runRename)
         QObject.connect(self.actionRemove, SIGNAL("triggered()"), controller.runRemove)
         
@@ -264,44 +319,10 @@ class Ui_MainWindow(object):
         
         # File Selection Widgets
         QObject.connect(self.localFilesTreeWidget, SIGNAL("itemSelectionChanged()"), self.localItemSelectionChanged)
-        #QObject.connect(self.localFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), controller.localFilesContextMenu)
         QObject.connect(self.localFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), self.localFilesContextMenu)
         QObject.connect(self.projectFilesTreeWidget, SIGNAL("itemSelectionChanged()"), self.projectItemSelectionChanged)
-        #QObject.connect(self.projectFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), controller.projectFilesContextMenu)
         QObject.connect(self.projectFilesTreeWidget, SIGNAL("customContextMenuRequested(QPoint)"), self.projectFilesContextMenu)
     
-    #def populateLocalTree(self):
-    #    self.localFilesTreeWidget.clear()
-    #    files = os.listdir(controller.getUserDir())
-    #    items = self.convertToLocalTreeWidgetItems(files)
-    #    self.localFilesTreeWidget.addTopLevelItems(items)
-    #    #addisonItem = QTreeWidgetItem(ui.localFilesTreeWidget)
-    #    #addisonItem.setText(0, "addison")
-    
-    #def populateProjectTree(self, MainWindow):
-    #    #root = QTreeWidgetItem(ui.projectFilesTreeWidget)
-    #    #root.setText(0, "Chasm")
-    #    assetItem = QTreeWidgetItem(ui.projectFilesTreeWidget)
-    #    assetItem.setText(0, "assets")
-    #    enviroItem = QTreeWidgetItem(assetItem)
-    #    enviroItem.setText(0, "environment")
-    #    charsItem = QTreeWidgetItem(assetItem)
-    #    charsItem.setText(0, "chars")
-    #    addisonItem = QTreeWidgetItem(charsItem)
-    #    addisonItem.setText(0, "addison")
-    #    addisonItem.setText(1, "No")
-    #    addisonItem.setText(2, "Brian Kingery")
-    #    addisonItem.setText(3, "Fri, 1 Jun 2012 7:25:00 PM")
-    #    addisonItem.setText(4, "Yes")
-    #    addisonItem.setText(5, "/grp5/Chasm/assets/chars/addison/inst/stable")
-    #    cliffItem = QTreeWidgetItem(enviroItem)
-    #    cliffItem.setText(0, "cliff_face")
-    #    cliffItem.setText(1, "No")
-    #    cliffItem.setText(2, "Morgan Strong")
-    #    cliffItem.setText(3, "Thu, 28 Jun 2001 4:20:00 PM")
-    #    cliffItem.setText(4, "Yes")
-    #    cliffItem.setText(5, "/grp5/Chasm/assets/environment/cliff_face/inst/stable")
-
     def checkout(self):
         controller.runCheckout(self)
     
@@ -310,6 +331,12 @@ class Ui_MainWindow(object):
     
     def install(self):
         controller.runInstall(self)
+    
+    def openFile(self):
+        controller.runOpen(self)
+    
+    def newFolder(self):
+        controller.runNew(self)
     
     def tabSwitch(self, tabNum):
         controller.tabSwitch(self, tabNum)
@@ -321,30 +348,10 @@ class Ui_MainWindow(object):
         controller.projectItemSelectionChanged(self)
     
     def localFilesContextMenu(self, point):
-        curItem = self.localFilesTreeWidget.currentItem()
-        if not type(curItem) == types.NoneType:
-            if curItem.text(2):
-                self.localPopMenu.popup(self.localFilesTreeWidget.mapToGlobal(point))
+        controller.localFilesContextMenu(self, point)
     
     def projectFilesContextMenu(self, point):
-        curItem = self.projectFilesTreeWidget.currentItem()
-        if not type(curItem) == types.NoneType:
-            if curItem.text(2):
-                self.actionCheckout.setEnabled(True)
-                self.actionInstall.setEnabled(True)
-                self.projectPopMenu.popup(self.projectFilesTreeWidget.mapToGlobal(point))
-            else:
-                self.actionCheckout.setEnabled(False)
-                self.actionInstall.setEnabled(False)
-                self.projectPopMenu.popup(self.projectFilesTreeWidget.mapToGlobal(point))
-    
-    def showFileDialog(self, filesToDisplay):
-        self.tw.clear()
-        self.tw.addTopLevelItems(filesToDisplay)
-        if self.file_select_dialog.exec_() == 1:
-            return self.tw.currentItem()
-        else:
-            return None
+        controller.projectFilesContextMenu(self, point)
     
     def getTreeItemPath(self, treeItem, path):
         if not type(treeItem.parent()) == types.NoneType:
@@ -352,15 +359,6 @@ class Ui_MainWindow(object):
         
         path = os.path.join(path, str(treeItem.text(0)))
         return path
-    
-    def convertToQTreeWidgetItems(self, files):
-        treeItems = []
-        for f in files:
-            item = QTreeWidgetItem()
-            item.setText(0, os.path.basename(f))
-            item.setText(1, f)
-            treeItems.append(item)
-        return treeItems
 
 
 if __name__ == "__main__":
@@ -374,9 +372,6 @@ if __name__ == "__main__":
     
     #Create in Memory model Project - looking for .config.ini
     controller.setup(ui)
-    
-    #ui.populateLocalTree()
-    #ui.populateProjectTree(MainWindow)
     
     MainWindow.show()
     sys.exit(app.exec_())

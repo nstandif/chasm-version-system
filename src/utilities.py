@@ -113,8 +113,11 @@ def addVersionedFolder(parent, name):
 	#os.symlink(os.path.join(new_dir, 'inst', getNullReference()), os.path.join(new_dir, 'inst','stable'))
 	os.symlink(getNullReference(), os.path.join(new_dir, 'inst','stable'))
 	createNodeInfoFile(new_dir)
+	return new_dir
 def addProjectFolder(parent, name):
-	os.makedirs(os.path.join(parent, name))
+	newPath = os.path.join(parent, name)
+	os.makedirs(newPath)
+	return newPath
 def removeFolder(name):
 	pass
 def renameFolder(oldName, newName):
@@ -133,12 +136,12 @@ def getVersionedFolderInfo(dirPath):
 	nodeInfo = []
 	cp = ConfigParser()
 	cp.read(os.path.join(dirPath, ".nodeInfo"))
-	print "NODEINFO:: "+ os.path.join(dirPath, ".nodeInfo")
+	#print "NODEINFO:: "+ os.path.join(dirPath, ".nodeInfo")
 	nodeInfo.append(cp.get("Versioning", "locked"))
 	nodeInfo.append(cp.get("Versioning", "lastcheckinuser"))
 	nodeInfo.append(cp.get("Versioning", "lastcheckintime"))
 	stable = os.path.join(dirPath, "inst", "stable")
-	print "STABLE:: " + stable
+	#print "STABLE:: " + stable
 	if os.path.exists(os.readlink(stable)) and not os.readlink(stable) == ".nullReference":
 		nodeInfo.append("Yes")
 		nodeInfo.append(stable)
@@ -165,7 +168,7 @@ def _createCheckoutInfoFile(dirPath, coPath, version, timestamp, lock):
 
 def getFilesCheckoutTime(filePath):
 	checkoutInfo = os.path.join(filePath, ".checkoutInfo")
-	print checkoutInfo
+	#print checkoutInfo
 	if not os.path.exists(checkoutInfo):
 		raise Exception("No checkout info available")
 	cp = ConfigParser()
