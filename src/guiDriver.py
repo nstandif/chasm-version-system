@@ -86,6 +86,96 @@ class NewFolderDialog(QDialog):
         else:
             return [None, None]
 
+class SettingsDialog(QDialog):
+    def setup(self):
+        self.setObjectName(_fromUtf8("SettingsDialog"))
+        self.resize(572, 349)
+        self.setWindowTitle(QApplication.translate("SettingsDialog", "Settings", None, QApplication.UnicodeUTF8))
+        self.buttonBox = QDialogButtonBox(self)
+        self.buttonBox.setGeometry(QRect(210, 300, 341, 32))
+        self.buttonBox.setOrientation(Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
+        
+        self.gridLayoutWidget = QWidget(self)
+        self.gridLayoutWidget.setGeometry(QRect(20, 20, 531, 231))
+        self.gridLayoutWidget.setObjectName(_fromUtf8("gridLayoutWidget"))
+        self.gridLayout = QGridLayout(self.gridLayoutWidget)
+        self.gridLayout.setMargin(0)
+        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+        
+        self.userlabel = QLabel(self.gridLayoutWidget)
+        self.userlabel.setText(QApplication.translate("SettingsDialog", "User Name:", None, QApplication.UnicodeUTF8))
+        self.userlabel.setObjectName(_fromUtf8("userlabel"))
+        self.gridLayout.addWidget(self.userlabel, 0, 0, 1, 1)
+        
+        self.projectlabel = QLabel(self.gridLayoutWidget)
+        self.projectlabel.setText(QApplication.translate("SettingsDialog", "Project Folder:", None, QApplication.UnicodeUTF8))
+        self.projectlabel.setObjectName(_fromUtf8("projectlabel"))
+        self.gridLayout.addWidget(self.projectlabel, 1, 0, 1, 1)
+        
+        self.locallabel = QLabel(self.gridLayoutWidget)
+        self.locallabel.setText(QApplication.translate("SettingsDialog", "Local Folder:", None, QApplication.UnicodeUTF8))
+        self.locallabel.setObjectName(_fromUtf8("locallabel"))
+        self.gridLayout.addWidget(self.locallabel, 2, 0, 1, 1)
+        
+        self.userLE = QLineEdit(self.gridLayoutWidget)
+        self.userLE.setObjectName(_fromUtf8("userLE"))
+        self.gridLayout.addWidget(self.userLE, 0, 1, 1, 1)
+        
+        self.projectLE = QLineEdit(self.gridLayoutWidget)
+        self.projectLE.setObjectName(_fromUtf8("projectLE"))
+        self.gridLayout.addWidget(self.projectLE, 1, 1, 1, 1)
+        
+        self.localLE = QLineEdit(self.gridLayoutWidget)
+        self.localLE.setObjectName(_fromUtf8("localLE"))
+        self.gridLayout.addWidget(self.localLE, 2, 1, 1, 1)
+        
+        self.projectBrowseButton = QPushButton(self.gridLayoutWidget)
+        self.projectBrowseButton.setText(QApplication.translate("SettingsDialog", "Browse", None, QApplication.UnicodeUTF8))
+        self.projectBrowseButton.setObjectName(_fromUtf8("projectBrowseButton"))
+        self.gridLayout.addWidget(self.projectBrowseButton, 1, 2, 1, 1)
+        
+        self.localBrowseButton = QPushButton(self.gridLayoutWidget)
+        self.localBrowseButton.setText(QApplication.translate("SettingsDialog", "Browse", None, QApplication.UnicodeUTF8))
+        self.localBrowseButton.setObjectName(_fromUtf8("localBrowseButton"))
+        self.gridLayout.addWidget(self.localBrowseButton, 2, 2, 1, 1)
+        
+        self.setupDirsDialog = QFileDialog(self)
+        
+        QObject.connect(self.buttonBox, SIGNAL(_fromUtf8("accepted()")), self.accept)
+        QObject.connect(self.buttonBox, SIGNAL(_fromUtf8("rejected()")), self.reject)
+        QObject.connect(self.projectBrowseButton, SIGNAL("clicked()"), self.browseProject)
+        QObject.connect(self.localBrowseButton, SIGNAL("clicked()"), self.browseLocal)
+        #QMetaObject.connectSlotsByName(self)
+    
+    def browseProject(self):
+        path = self.setupDirsDialog.getExistingDirectory(self, "Choose Project Dir", os.environ['HOME'])
+        if not path.isNull():
+            self.projectLE.setText(path)
+    
+    def browseLocal(self):
+        path = self.setupDirsDialog.getExistingDirectory(self, "Choose Local Directory", os.environ['HOME'])
+        if not path.isNull():
+            self.localLE.setText(path)
+    
+    def run(self):
+        old_userName = self.userLE.text()
+        old_projectPath = self.projectLE.text()
+        old_localPath = self.localLE.text()
+        if self.exec_() == 1:
+            userName = self.userLE.text()
+            projectPath = self.projectLE.text()
+            localPath = self.localLE.text()
+            return [userName, projectPath, localPath]
+        else:
+            return [old_userName, old_projectPath, old_localPath]
+    
+    def loadSettings(self, userName, projectPath, localPath):
+        self.userLE.setText(userName)
+        self.projectLE.setText(projectPath)
+        self.localLE.setText(localPath)
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         self._MainWindow = MainWindow
@@ -160,7 +250,7 @@ class Ui_MainWindow(object):
         self.actionSettings.setObjectName(_fromUtf8("actionSettings"))
         
         self.actionCheckout = QAction(MainWindow)
-        self.actionCheckout.setEnabled(True)
+        #self.actionCheckout.setEnabled(True)
         icon2 = QIcon()
         icon2.addPixmap(QPixmap(_fromUtf8(os.path.join("..","resources","PNG_Files","Misc","Download.PNG"))), QIcon.Normal, QIcon.Off)
         self.actionCheckout.setIcon(icon2)
@@ -247,12 +337,13 @@ class Ui_MainWindow(object):
         ## Message Box
         self.messageBox = QMessageBox(MainWindow)
         
-        ## Setup Directory Dialog
-        self.setupDirsDialog = QFileDialog(MainWindow)
-        
         ## New Folder Dialog
         self.newFolderDialog = NewFolderDialog(MainWindow)
         self.newFolderDialog.setup()
+        
+        ## Settings Dialog
+        self.settingsDialog = SettingsDialog(MainWindow)
+        self.settingsDialog.setup()
     
     def retranslateUi(self, MainWindow):
         #Set Titles
@@ -308,7 +399,7 @@ class Ui_MainWindow(object):
         QObject.connect(self.actionCheckin, SIGNAL("triggered()"), self.checkin)
         QObject.connect(self.actionInstall, SIGNAL("triggered()"), self.install)
         QObject.connect(self.actionOpen_File, SIGNAL("triggered()"), self.openFile)
-        QObject.connect(self.actionSettings, SIGNAL("triggered()"), controller.runSettings)
+        QObject.connect(self.actionSettings, SIGNAL("triggered()"), self.settings)
         QObject.connect(self.actionUpdate_Plugins, SIGNAL("triggered()"), controller.runUpdatePlugins)
         QObject.connect(self.actionNew, SIGNAL("triggered()"), self.newFolder)
         QObject.connect(self.actionRename, SIGNAL("triggered()"), controller.runRename)
@@ -334,6 +425,9 @@ class Ui_MainWindow(object):
     
     def openFile(self):
         controller.runOpen(self)
+    
+    def settings(self):
+        controller.runSettings(self)
     
     def newFolder(self):
         controller.runNew(self)
@@ -370,8 +464,7 @@ if __name__ == "__main__":
     
     ui.connectSignalsAndSlots(MainWindow)
     
+    MainWindow.show()
     #Create in Memory model Project - looking for .config.ini
     controller.setup(ui)
-    
-    MainWindow.show()
     sys.exit(app.exec_())

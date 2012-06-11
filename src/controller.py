@@ -10,23 +10,12 @@ _tabNum = 0
 def setup(ui):
     #TODO change to .config.ini to match utilities
     if not os.path.exists(".myConfig.ini"):
-        parms = []
-        parms.append("Chasm")
-        ui.messageBox.setText("Please choose the root project directory")
-        ui.messageBox.exec_()
-        parms.append(str(ui.setupDirsDialog.getExistingDirectory(ui._MainWindow, "Choose Project Dir", os.environ['HOME'])))
-        #TODO ask for user name?
-        parms.append(os.getlogin())
-        ui.messageBox.setText("Please choose your local directory")
-        ui.messageBox.exec_()
-        parms.append(str(ui.setupDirsDialog.getExistingDirectory(ui._MainWindow, "Choose Local Directory", os.environ['HOME'])))
-        
-        utilities._configureProject(parms, '.myConfig.ini')
+        runSettings(ui)
     else:
         configureProject('.myConfig.ini')
-    populateLocalTree(ui)
-    populateProjectTree(ui)
-    enableComponents(ui)
+        populateLocalTree(ui)
+        populateProjectTree(ui)
+        enableComponents(ui)
     
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Common User Actions
 
@@ -117,8 +106,18 @@ def runOpen(ui):
 def runUpdatePlugins():
     print "Update Plugins"
 
-def runSettings():
-    print "Settings"
+def runSettings(ui):
+    ui.settingsDialog.loadSettings(getUsername(), getProjectDir(), getUserDir())
+    userName, projDir, userDir = ui.settingsDialog.run()
+    parms = []
+    parms.append("Chasm")
+    parms.append(str(projDir))
+    parms.append(str(userName))
+    parms.append(str(userDir))
+    utilities._configureProject(parms, '.myConfig.ini')
+    populateLocalTree(ui)
+    populateProjectTree(ui)
+    enableComponents(ui)
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Model to GUI Conversions
 
