@@ -39,6 +39,10 @@ def isUnlockedAsset(node):
 
 def isUnlockedSopNode(node):
     return isinstance(node, hou.SopNode) and not node.isHardLocked()
+
+def needsToBeLocked(node):
+    types = ["File"]
+    return node.type().description() in types
     
 def lockFileNodes(srcFilePath, newInstFilePath):
     """
@@ -55,13 +59,14 @@ def lockFileNodes(srcFilePath, newInstFilePath):
             child.setLocked(on)
             #child.type().definition().updateFromNode(child)
             #child.matchCurrentDefinition()
-        elif isUnlockedSopNode(child):
+        elif isUnlockedSopNode(child) and needsToBeLocked(child):
             #print child.name()
             try:
                 child.setHardLocked(True)
             except hou.PermissionError as e:
-                print "CAN'T LOCK SOPNODE:: " + child.name()
+                #print "CAN'T LOCK SOPNODE:: " + child.name()
                 #print e
+                print ""
     
     hou.hipFile.save(newInstFilePath)
 
