@@ -337,6 +337,9 @@ class Ui_MainWindow(object):
         ## Message Box
         self.messageBox = QMessageBox(MainWindow)
         
+        ## Rename Dialog
+        self.renameDialog = QInputDialog(MainWindow)
+        
         ## New Folder Dialog
         self.newFolderDialog = NewFolderDialog(MainWindow)
         self.newFolderDialog.setup()
@@ -351,6 +354,7 @@ class Ui_MainWindow(object):
         self.localFilesTreeWidget.headerItem().setText(0, QApplication.translate("MainWindow", "File Name", None, QApplication.UnicodeUTF8))
         self.localFilesTreeWidget.headerItem().setText(1, QApplication.translate("MainWindow", "Check Out Time", None, QApplication.UnicodeUTF8))
         self.localFilesTreeWidget.headerItem().setText(2, QApplication.translate("MainWindow", "Last Opened", None, QApplication.UnicodeUTF8))
+        self.localFilesTreeWidget.header().resizeSection(0, 150)
         self.fileTabs.setTabText(self.fileTabs.indexOf(self.localFilesTab), QApplication.translate("MainWindow", "My Checked Out Files", None, QApplication.UnicodeUTF8))
         
         #Set Section Sizes
@@ -402,8 +406,8 @@ class Ui_MainWindow(object):
         QObject.connect(self.actionSettings, SIGNAL("triggered()"), self.settings)
         QObject.connect(self.actionUpdate_Plugins, SIGNAL("triggered()"), controller.runUpdatePlugins)
         QObject.connect(self.actionNew, SIGNAL("triggered()"), self.newFolder)
-        QObject.connect(self.actionRename, SIGNAL("triggered()"), controller.runRename)
-        QObject.connect(self.actionRemove, SIGNAL("triggered()"), controller.runRemove)
+        QObject.connect(self.actionRename, SIGNAL("triggered()"), self.rename)
+        QObject.connect(self.actionRemove, SIGNAL("triggered()"), self.remove)
         
         # Tabs
         QObject.connect(self.fileTabs, SIGNAL("currentChanged(int)"), self.tabSwitch)
@@ -432,6 +436,12 @@ class Ui_MainWindow(object):
     def newFolder(self):
         controller.runNew(self)
     
+    def rename(self):
+        controller.runRename(self)
+    
+    def remove(self):
+        controller.runRemove(self)
+    
     def tabSwitch(self, tabNum):
         controller.tabSwitch(self, tabNum)
     
@@ -453,6 +463,15 @@ class Ui_MainWindow(object):
         
         path = os.path.join(path, str(treeItem.text(0)))
         return path
+    
+    def removeTreeItem(self, item):
+        parent = item.parent()
+        if not type(parent) == types.NoneType:
+            parent.removeChild(item)
+        else:
+            tree = item.treeWidget()
+            index = tree.indexOfTopLevelItem(item)
+            tree.takeTopLevelItem(index)
 
 
 if __name__ == "__main__":
@@ -461,10 +480,8 @@ if __name__ == "__main__":
     MainWindow = QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
-    
     ui.connectSignalsAndSlots(MainWindow)
     
     MainWindow.show()
-    #Create in Memory model Project - looking for .config.ini
     controller.setup(ui)
     sys.exit(app.exec_())

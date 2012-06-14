@@ -88,12 +88,36 @@ def runNew(ui):
             else:
                 newPath = addVersionedFolder(getProjectDir(), folderName)
             ui.projectFilesTreeWidget.addTopLevelItems(convertToProjectTreeItems([newPath]))
+    else:
+        print "local new"
     
-def runRename():
-    print "Rename"
+def runRename(ui):
+    if ui.fileTabs.currentIndex() == 1:
+        curItem = ui.projectFilesTreeWidget.currentItem()
+        ui.renameDialog.setTextValue(curItem.text(0))
+        if ui.renameDialog.exec_() == 1:
+            name = str(ui.renameDialog.textValue())
+            try:
+                renameFolder(ui.getTreeItemPath(curItem, getProjectDir()), name)
+                curItem.setText(0, name)
+            except Exception as e:
+                ui.errorMessage.showMessage(str(e))
 
-def runRemove():
-    print "Remove"
+def runRemove(ui):
+    if ui.fileTabs.currentIndex() == 1:
+        curItem = ui.projectFilesTreeWidget.currentItem()
+        curItemPath = str(ui.getTreeItemPath(curItem, getProjectDir()))
+        if not isEmptyFolder(curItemPath):
+            warning = "Folder NOT empty! You will distroy data! \nContinue?"
+            reply = ui.messageBox.question(ui._MainWindow,'Warning', warning, QMessageBox.Yes, QMessageBox.No)
+        else:
+            reply = QMessageBox.Yes
+        if reply == QMessageBox.Yes:
+            removeFolder(curItemPath)
+            ui.removeTreeItem(curItem)
+            #index = ui.projectFilesTreeWidget.indexOfTopLevelItem(curItem)
+            #print index
+            #ui.projectFilesTreeWidget.takeTopLevelItem(index)
 
 def runOpen(ui):
     if ui.fileTabs.currentIndex() == 0:
@@ -185,23 +209,29 @@ def populateLocalTree(ui):
 def enableComponents(ui):
     # Project Tab Open
     if ui.fileTabs.currentIndex():
+        ui.actionCheckin.setEnabled(False)
+        ui.actionOpen_File.setEnabled(False)
+        
+        ui.actionNew.setEnabled(True)
+        ui.actionCheckout.setEnabled(False)
+        ui.actionInstall.setEnabled(False)
+        ui.actionCache_to_Alembic.setEnabled(False)
         ui.actionRename.setEnabled(False)
         ui.actionRemove.setEnabled(False)
         
         curItem = ui.projectFilesTreeWidget.currentItem()
-        ui.actionCheckin.setEnabled(False)
-        ui.actionOpen_File.setEnabled(False)
         if not type(curItem) == types.NoneType and curItem.isSelected():
-            if curItem.text(2):
+            curItemPath = ui.getTreeItemPath(curItem, getProjectDir())
+            #if curItem.text(2):
+            if isVersionedFolder(curItemPath):
                 ui.actionNew.setEnabled(False)
                 ui.actionCheckout.setEnabled(True)
                 ui.actionInstall.setEnabled(True)
                 ui.actionCache_to_Alembic.setEnabled(True)
-        else:
-            ui.actionNew.setEnabled(True)
-            ui.actionCheckout.setEnabled(False)
-            ui.actionInstall.setEnabled(False)
-            ui.actionCache_to_Alembic.setEnabled(False)
+            if canRename(curItemPath):
+                ui.actionRename.setEnabled(True)
+            if canRemove(curItemPath):
+                ui.actionRemove.setEnabled(True)
     # Local Tab Open
     else:
         ui.actionNew.setEnabled(False)

@@ -118,13 +118,56 @@ def addProjectFolder(parent, name):
 	newPath = os.path.join(parent, name)
 	os.makedirs(newPath)
 	return newPath
-def removeFolder(name):
-	pass
-def renameFolder(oldName, newName):
-	pass
+
+def isEmptyFolder(dirPath):
+	return not bool(glob.glob(os.path.join(dirPath, '*')))
+
+def canRemove(dirPath):
+	return canRename(dirPath)
+
+def removeFolder(dirPath):
+	if not canRemove(dirPath):
+		raise Exception ("Can not Remove")
+	shutil.rmtree(dirPath)
+
+def canRename(dirPath):
+	if not hasInstalledChild(dirPath) and not isCheckedOut(dirPath):
+		return True
+	return False
+
+def renameFolder(oldDir, newName):
+	if not canRename(oldDir):
+		raise Exception ("Can not rename")
+	head, tail = os.path.split(oldDir)
+	dest = os.path.join(head, newName)
+	if os.path.exists(dest):
+		raise Exception ("Folder already exists")
+	os.renames(oldDir, dest)
+
+def hasInstalledChild(dirPath):
+	if isVersionedFolder(dirPath) and isInstalled(dirPath):
+		return True
+	
+	found = False
+	if os.path.isdir(dirPath):
+		children = glob.glob(os.path.join(dirPath, '*'))
+		for c in children:
+			found = hasInstalledChild(c)
+			if found:
+				break
+	return found
+
 
 def isVersionedFolder(dirPath):
 	if os.path.exists(os.path.join(dirPath, ".nodeInfo")):
+		return True
+	else:
+		return False
+
+def isInstalled(dirPath):
+	stable = os.path.join(dirPath, "inst", "stable")
+	#print os.path.basename(os.readlink(stable))
+	if os.path.exists(os.readlink(stable)) and not os.path.basename(os.readlink(stable)) == ".nullReference":
 		return True
 	else:
 		return False
@@ -136,15 +179,12 @@ def getVersionedFolderInfo(dirPath):
 	nodeInfo = []
 	cp = ConfigParser()
 	cp.read(os.path.join(dirPath, ".nodeInfo"))
-	#print "NODEINFO:: "+ os.path.join(dirPath, ".nodeInfo")
 	nodeInfo.append(cp.get("Versioning", "locked"))
 	nodeInfo.append(cp.get("Versioning", "lastcheckinuser"))
 	nodeInfo.append(cp.get("Versioning", "lastcheckintime"))
-	stable = os.path.join(dirPath, "inst", "stable")
-	#print "STABLE:: " + stable
-	if os.path.exists(os.readlink(stable)) and not os.readlink(stable) == ".nullReference":
+	if isInstalled(dirPath):
 		nodeInfo.append("Yes")
-		nodeInfo.append(stable)
+		nodeInfo.append(os.path.join(dirPath, "inst", "stable"))
 	else:
 		nodeInfo.append("No")
 		nodeInfo.append("")
@@ -165,6 +205,14 @@ def _createCheckoutInfoFile(dirPath, coPath, version, timestamp, lock):
 	chkoutInfo.set("Checkout", "lockedbyme", str(lock))
 	
 	_writeConfigFile(os.path.join(dirPath, ".checkoutInfo"), chkoutInfo)
+
+def isCheckedOut(dirPath):
+	nodeInfo = os.path.join(dirPath, ".nodeInfo")
+	if not os.path.exists(nodeInfo):
+		return False
+	cp = ConfigParser()
+	cp.read(nodeInfo)
+	return cp.getboolean("Versioning", "locked")
 
 def getFilesCheckoutTime(filePath):
 	checkoutInfo = os.path.join(filePath, ".checkoutInfo")
@@ -204,7 +252,7 @@ def checkout(coPath, lock):
 	if nodeInfo.get("Versioning", "locked") == "False":
 		version = nodeInfo.get("Versioning", "latestversion")
 		toCopy = os.path.join(coPath, "src", "v"+version)
-		dest = os.path.join(getUserDir(), os.path.basename(coPath))
+		dest = os.path.join(getUserDir(), os.path.basename(os.path.dirname(coPath))+"_"+os.path.basename(coPath)+"_"+version)
 		
 		if(os.path.exists(toCopy)):
 			try:
@@ -301,7 +349,6 @@ def getAvailableInstallFiles(vDirPath):
 	latest = os.path.join(vDirPath, "src", "v"+version)
 	
 	files = glob.glob(os.path.join(latest,'*'))
-	#files = os.listdir(latest)
 	return files
 
 def _isHoudiniFile(filename):
