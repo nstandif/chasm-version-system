@@ -134,15 +134,16 @@ def runUpdatePlugins():
 def runSettings(ui):
     ui.settingsDialog.loadSettings(getUsername(), getProjectDir(), getUserDir())
     userName, projDir, userDir = ui.settingsDialog.run()
-    parms = []
-    parms.append("Chasm")
-    parms.append(str(projDir))
-    parms.append(str(userName))
-    parms.append(str(userDir))
-    utilities._configureProject(parms, '.myConfig.ini')
-    populateLocalTree(ui)
-    populateProjectTree(ui)
-    enableComponents(ui)
+    if not userName == None and not projDir == None and not userDir == None:
+        parms = []
+        parms.append("Chasm")
+        parms.append(str(projDir))
+        parms.append(str(userName))
+        parms.append(str(userDir))
+        utilities._configureProject(parms, '.myConfig.ini')
+        populateLocalTree(ui)
+        populateProjectTree(ui)
+        enableComponents(ui)
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Model to GUI Conversions
 

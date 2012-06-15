@@ -94,6 +94,7 @@ class SettingsDialog(QDialog):
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(210, 300, 341, 32))
         self.buttonBox.setOrientation(Qt.Horizontal)
+        #self.OKButton = QDialogButtonBox.Ok
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
         
@@ -143,11 +144,39 @@ class SettingsDialog(QDialog):
         
         self.setupDirsDialog = QFileDialog(self)
         
+        # Variables
+        self.userName = ""
+        self.projDir = ""
+        self.localDir = ""
+        
         QObject.connect(self.buttonBox, SIGNAL(_fromUtf8("accepted()")), self.accept)
         QObject.connect(self.buttonBox, SIGNAL(_fromUtf8("rejected()")), self.reject)
         QObject.connect(self.projectBrowseButton, SIGNAL("clicked()"), self.browseProject)
         QObject.connect(self.localBrowseButton, SIGNAL("clicked()"), self.browseLocal)
+        QObject.connect(self.userLE, SIGNAL("textChanged(QString)"), self.setUserName)
+        QObject.connect(self.projectLE, SIGNAL("textChanged(QString)"), self.setProjDir)
+        QObject.connect(self.localLE, SIGNAL("textChanged(QString)"), self.setLocalDir)
         #QMetaObject.connectSlotsByName(self)
+    
+    def setUserName(self, text):
+        self.userName = text
+        self.enableComponents()
+    def setProjDir(self, text):
+        self.projDir = text
+        self.enableComponents()
+    def setLocalDir(self, text):
+        self.localDir = text
+        self.enableComponents()
+    
+    def enableComponents(self):
+        if self.userName == "" or self.projDir == "" or self.localDir == "":
+            #self.OKButton.setEnabled(False)
+            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        elif not os.path.exists(self.projDir) or not os.path.exists(self.localDir):
+            #self.OKButton.setEnabled(True)
+            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        else:
+            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
     
     def browseProject(self):
         path = self.setupDirsDialog.getExistingDirectory(self, "Choose Project Dir", os.environ['HOME'])
@@ -160,16 +189,20 @@ class SettingsDialog(QDialog):
             self.localLE.setText(path)
     
     def run(self):
-        old_userName = self.userLE.text()
-        old_projectPath = self.projectLE.text()
-        old_localPath = self.localLE.text()
+        #self.userName = self.userLE.text()
+        #self.projectPath = self.projectLE.text()
+        #self.localPath = self.localLE.text()
+        self.setUserName(self.userLE.text())
+        self.setProjDir(self.projectLE.text())
+        self.setLocalDir(self.localLE.text())
+        
         if self.exec_() == 1:
-            userName = self.userLE.text()
-            projectPath = self.projectLE.text()
-            localPath = self.localLE.text()
-            return [userName, projectPath, localPath]
+            self.userName = self.userLE.text()
+            self.projectPath = self.projectLE.text()
+            self.localPath = self.localLE.text()
+            return [self.userName, self.projectPath, self.localPath]
         else:
-            return [old_userName, old_projectPath, old_localPath]
+            return [None, None, None]
     
     def loadSettings(self, userName, projectPath, localPath):
         self.userLE.setText(userName)
