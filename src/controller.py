@@ -57,14 +57,16 @@ def runInstall(ui):
         curItem = ui.projectFilesTreeWidget.currentItem()
         vDirPath = ui.getTreeItemPath(curItem, getProjectDir())
         files = getAvailableInstallFiles(vDirPath)
-        srcFilePath = str(ui.file_select_dialog.selectFile(convertToFileSelectionDialogItems(files)).text(1))
-        #TODO ask about stable
-        try:
-            install(vDirPath, srcFilePath, True)
-            setProjectTreeVersionedItemInfo(curItem, vDirPath)
-            #populateProjectTree(ui)
-        except Exception as e:
-            ui.errorMessage.showMessage(str(e))
+        selected = ui.file_select_dialog.selectFile(convertToFileSelectionDialogItems(files))
+        if not selected == None:
+            srcFilePath = str(selected.text(1))
+            #TODO ask about stable
+            try:
+                install(vDirPath, srcFilePath, True)
+                setProjectTreeVersionedItemInfo(curItem, vDirPath)
+                #populateProjectTree(ui)
+            except Exception as e:
+                ui.errorMessage.showMessage(str(e))
     else:
         ui.errorMessage.showMessage("You can only install project files")
 
@@ -115,17 +117,16 @@ def runRemove(ui):
         if reply == QMessageBox.Yes:
             removeFolder(curItemPath)
             ui.removeTreeItem(curItem)
-            #index = ui.projectFilesTreeWidget.indexOfTopLevelItem(curItem)
-            #print index
-            #ui.projectFilesTreeWidget.takeTopLevelItem(index)
 
 def runOpen(ui):
     if ui.fileTabs.currentIndex() == 0:
         curItem = ui.localFilesTreeWidget.currentItem()
         dirPath = ui.getTreeItemPath(curItem, getUserDir())
         files = glob.glob(os.path.join(dirPath, "*"))
-        toOpen = str(ui.file_select_dialog.selectFile(convertToFileSelectionDialogItems(files)).text(1))
-        os.system("xdg-open "+toOpen)
+        selected = ui.file_select_dialog.selectFile(convertToFileSelectionDialogItems(files))
+        if not selected == None:
+            toOpen = str(selected.text(1))
+            os.system("xdg-open "+toOpen)
 
 def runUpdatePlugins():
     print "Update Plugins"
